@@ -10,18 +10,11 @@ admin.initializeApp({
   databaseURL: "https://socialape-e3733.firebaseio.com"
 });
 
-
-
 const express=require('express')
 
 const app=express()
 
-
 const firebase =require('firebase')
-
-
-
-
 
 const firebaseConfig = {
     apiKey: "AIzaSyBzXaJywI3W3XhMeTMPv88RUxV5bYW6r5c",
@@ -36,10 +29,7 @@ const firebaseConfig = {
  
  firebase.initializeApp(firebaseConfig);
 
-
-
 const db=admin.firestore()
-
 
 app.get('/screams',(request,response)=>{
 
@@ -65,17 +55,65 @@ app.get('/screams',(request,response)=>{
 
 		return response.json(screams);
 
-
-
 	}).catch(err=>console.error(err))
 })
 
-app.post('/screams',(request,response)=>{
+const FBAuth=(request,response,next)=>{
+
+	let idToken;
+
+	if(request.headers.authorization && request.headers.authorization.startsWith('Bearer ')){
+
+		idToken=request.headers.authorization.split('Bearer ')[1]
+
+	}else{
+
+		console.error('No token created')
+
+		return response.status(403).json({error:'Unauthorized'})
+
+	}
+
+	admin.auth().verifyIdToken(idToken)
+	.then( decodedToken =>{
+
+		request.user=decodedToken
+
+		console.log(decodedToken)
+
+		return db.collection('users').where('userId','==',request.user.uid).limit(1).get()
+
+	}).then(data=>{
+
+
+		request.user.handle=data.docs[0].data().handle;
+
+
+		return next()
+	
+	}).catch(err=>{
+
+		console.error('Error While Verifying token',err)
+
+		return response.status(403).json(err)
+
+
+	})
+}
+
+
+
+app.post('/screams',FBAuth,(request,response)=>{
+
+	if(request.body.scream.trim()===''){
+		return response.status(400).json({body:'Body Must Not be Empty'})
+	}
+
 
 	const newScream={
 
 		scream:request.body.scream,
-		userHandle:request.body.userHandle,
+		userHandle:request.user.handle,
 		createdAt:admin.firestore.Timestamp.fromDate(new Date())
 	}
 
@@ -99,11 +137,21 @@ const isEmpty=(string)=>{
 
 }
 
+const isEmail=(email)=>{
+
+		const regex="^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$";
+
+		if(email.match(regex)) return true
+
+		return false	
+
+	}
 
 
 app.post('/signup',(request,response)=>{
 
 	const newUser={
+
 		email:request.body.email,
 		password:request.body.password,
 		confirmPassword:request.body.confirmPassword,
@@ -111,18 +159,9 @@ app.post('/signup',(request,response)=>{
 
 	}
 
-	let errors
-
-
-	const isEmail=(email)=>{
-
-		const regex='^[A-Z0-9][A-Z0-9._%+-]{0,63}@(?:[A-Z0-9](?:[A-Z0-9-]{0,62}[A-Z0-9])?\.){1,8}[A-Z]{2,63}$'
-
-		if(email.match(regex)) return true
-
-		else return false	
-
-	}
+	let errors={}
+	
+    console.log(isEmail(newUser.email))
 
 
 	if(isEmpty(newUser.email)){
@@ -139,8 +178,10 @@ app.post('/signup',(request,response)=>{
 
 	if(newUser.password !== newUser.confirmPassword) errors.confirmPassword=" Passwords must match"	
 
-
+	if(isEmpty(newUser.handle)) errors.handle="Must not be empty"
 	
+	if(Object.keys(errors).length>0) return response.status(400).json(errors)	
+
 
 	let token,userId;
 
@@ -168,6 +209,7 @@ app.post('/signup',(request,response)=>{
 		token=Idtoken;
 
 		const userCredentials={
+
 			handle:newUser.handle,
 			email:newUser.email,
 			createdAt:new Date().toISOString(),
@@ -197,6 +239,49 @@ app.post('/signup',(request,response)=>{
         }
 
 	})
+
+})
+
+
+app.post('/login',(request,response)=>{
+
+	const user={
+
+		email:request.body.email,
+		password:request.body.password
+	}
+
+	console.log(user)
+
+	let errors={}
+
+	if(isEmpty(user.email)) errors.email="Must not be empty"
+
+	if(isEmpty(user.password)) errors.password="Password must not be empty"
+
+	if(Object.keys(errors).length>0){
+
+		return response.status(400).json(errors)
+	}	
+
+
+	firebase.auth().signInWithEmailAndPassword(user.email,user.password)
+	.then(data=>{
+		return data.user.getIdToken();
+	}).
+	then(token=>{
+
+		return response.json({token})
+	})
+	.catch(err=>{
+		console.error(err)
+
+		if(err.code==='auth/wrong-password'){
+			return response.status(403).json({general:'Wrong credentials,Please try again'})
+		}else return response.status(500).json({error:err.code}) 
+
+	})
+
 
 })
 
