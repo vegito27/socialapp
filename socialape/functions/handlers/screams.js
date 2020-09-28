@@ -19,8 +19,8 @@ exports.getAllScreams=(request,response)=>{
 					scream:doc.data().scream,
 					userHandle:doc.data().userHandle,
 					createdAt:new Date().toISOString(),
-					commentCount:doc.data().commentCount,
-					likeCount:doc.data().likeCount
+					// commentCount:doc.data().commentCount,
+					// likeCount:doc.data().likeCount
 			})
 
 		})
@@ -46,14 +46,13 @@ exports.postOneScream=(request,response)=>{
 
 	}
 
-
 	const newScream={
 
 		scream:request.body.scream,
 		userHandle:request.user.handle,
 		createdAt:admin.firestore.Timestamp.fromDate(new Date()),
-		commentCount:doc.data().commentCount,
-		likeCount:doc.data().likeCount
+		// commentCount:doc.data().commentCount,
+		// likeCount:doc.data().likeCount
 	}
 
 	db.collection('screams')
