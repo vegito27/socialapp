@@ -1,11 +1,8 @@
 const {db,admin}=require('../util/admin')
 
-
-
 const firebase =require('firebase')
 
-
-const firebaseConfig = {
+const config = {
     apiKey: "AIzaSyBzXaJywI3W3XhMeTMPv88RUxV5bYW6r5c",
     authDomain: "socialape-e3733.firebaseapp.com",
     databaseURL: "https://socialape-e3733.firebaseio.com",
@@ -15,11 +12,9 @@ const firebaseConfig = {
     appId: "1:1093671129591:web:912d27184b70c93e5c5ef2",
     measurementId: "G-7LSRD6GFF9"
   };
-
  
- firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(config);
  
-
 
 const isEmpty=(string)=>{
 
@@ -39,7 +34,6 @@ const isEmail=(email)=>{
 }
 
 
-
 exports.login=(request,response)=>{
 
 	const user={
@@ -49,6 +43,7 @@ exports.login=(request,response)=>{
 	}
 
 	console.log(user)
+
 
 	let errors={}
 
@@ -116,6 +111,7 @@ exports.signup=(request,response)=>{
 
 
 	let token,userId;
+    let img='4.jpeg'
 
 
 	db.doc(`/users/${newUser.handle}`).get().then(doc=>{
@@ -145,6 +141,7 @@ exports.signup=(request,response)=>{
 			handle:newUser.handle,
 			email:newUser.email,
 			createdAt:new Date().toISOString(),
+			imageUrl:`https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${img}?alt=media`,
 			userId: userId
 		}
 
@@ -178,7 +175,7 @@ exports.ImageUpload=(request,response)=>{
 	const os=require('os')
 	const fs=require('fs')
 
-	const busbuy=new BusBoy({ headers:request.headers })
+	const busboy=new BusBoy({ headers:request.headers })
 
 
 	let imageFileName;
@@ -186,21 +183,27 @@ exports.ImageUpload=(request,response)=>{
 	let imageToBeUploaded={};
 
 
-	busboy.on('file',(fieldname,file,filename,mimetype)=>{
+	busboy.on('file',(fieldname,file,filename,encoding,mimetype)=>{
+
+		if(mimetype!== 'image/jpeg' && mimetype!=='image/png'){
+
+			return response.status(400).json({error: 'Wrong File Type Submitted'})
+
+		}
 
 		console.log(filename)
 		console.log(fieldname)
 		console.log(mimetype)
 
-		const ImageExtension=filename.split('.')[filename.split('.').length-1]
+		const imageExtension=filename.split('.')[filename.split('.').length-1]
 
-		const ImageFileName=filename.split('.')[0]
+		const imageFileName=filename.split('.')[0]
 
-		console.log(ImageFileName)
+		console.log(imageFileName)
 
-		const filePath=path.join(os.tmpdir(),ImageFileName)
+		const filepath=path.join(os.tmpdir(),imageFileName)
 
-		imageToBeUploaded={filepath,mimetype}
+		imageToBeUploaded={ filepath, mimetype}
 
 		file.pipe(fs.createWriteStream(filepath))
 
@@ -209,22 +212,27 @@ exports.ImageUpload=(request,response)=>{
 
 	busboy.on('finish',()=>{
 
-		admin.storage().bucket().upload(imageToBeUploaded.filepath,
+		admin.storage().bucket(config.storageBucket).upload(
+
+		imageToBeUploaded.filepath,
 		{
 			resumable:false,
 
 			metadata:{
 
 				metadata:{
+
 				contentType:imageToBeUploaded.mimetype
 			}
 		}
 
-	}).then(()=>{
+	})
+	.then(()=>{
 
 		const ImageUrl=`https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`
 
 		return db.doc(`/users/${request.user.handle}`).update({ ImageUrl })
+
 
 	}).then(()=>{
 
@@ -238,8 +246,13 @@ exports.ImageUpload=(request,response)=>{
 
     })
 
+})
 
-	})
+	busboy.end(request.rawBody)
+
+
+
+
 }
 
 

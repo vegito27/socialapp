@@ -23,7 +23,7 @@ const { getAllScreams,postOneScream } = require('./handlers/screams')
 
 const { login,signup,ImageUpload } =require('./handlers/users')
 
-const {isEmpty,isEmail,FBAuth }=require('./handlers/auth')
+const {isEmpty,isEmail,FBAuth } = require('./handlers/auth')
 
 
 
@@ -38,111 +38,104 @@ app.post('/signup',signup)
 app.post('/user/image',FBAuth,ImageUpload)
 
 
+// app.post('/signup',(request,response)=>{
 
+// 	const newUser={
 
+// 		email:request.body.email,
+// 		password:request.body.password,
+// 		confirmPassword:request.body.confirmPassword,
+// 		handle:request.body.handle
 
+// 	}
 
-app.post('/signup',(request,response)=>{
-
-	const newUser={
-
-		email:request.body.email,
-		password:request.body.password,
-		confirmPassword:request.body.confirmPassword,
-		handle:request.body.handle
-	}
-
-
-
-	let errors={}
+// 	let errors={}
 	
-    console.log(isEmail(newUser.email))
+//     console.log(isEmail(newUser.email))
 
 
-	if(isEmpty(newUser.email)){
+// 	if(isEmpty(newUser.email)){
 
-		errors.email='Email must not be empty'
+// 		errors.email='Email must not be empty'
 
-	}else if(!isEmail(newUser.email)){
+// 	}else if(!isEmail(newUser.email)){
 
-		errors.email='must be a valid email address'
+// 		errors.email='must be a valid email address'
 
-	} 
- 
-	if(isEmpty(newUser.password))errors.password="Must not be empty" 
+// 	} 
 
-	if(newUser.password !== newUser.confirmPassword) errors.confirmPassword=" Passwords must match"	
+// 	if(isEmpty(newUser.password))errors.password="Must not be empty" 
 
-	if(isEmpty(newUser.handle)) errors.handle="Must not be empty"
+// 	if(newUser.password !== newUser.confirmPassword) errors.confirmPassword=" Passwords must match"	
+
+// 	if(isEmpty(newUser.handle)) errors.handle="Must not be empty"
 	
-	if(Object.keys(errors).length>0) return response.status(400).json(errors)	
+// 	if(Object.keys(errors).length>0) return response.status(400).json(errors)	
 
-	let noImg='no-img.png'
+	
+
+// 	let img='4.jpeg'
 
 
-	let token,userId;
+// 	let token,userId;
 
 
-	db.doc(`/users/${newUser.handle}`).get().then(doc=>{
+// 	db.doc(`/users/${newUser.handle}`).get().then(doc=>{
 
-		if(doc.exists){
+// 		if(doc.exists){
 
-			return response.status(400).json({handle:'this handle has already taken'})
+// 			return response.status(400).json({handle:'this handle has already taken'})
 		
-		}else{
+// 		}else{
 
-			return firebase.auth().createUserWithEmailAndPassword(newUser.email,newUser.password)
-		}
-	})
-	.then(data=>{
-		// return response.status(201).json({message:`user ${data.user.uid} signed up successfully`})
+// 			return firebase.auth().createUserWithEmailAndPassword(newUser.email,newUser.password)
+// 		}
+// 	})
+// 	.then(data=>{
+// 		// return response.status(201).json({message:`user ${data.user.uid} signed up successfully`})
 
-		userId=data.user.uid
+// 		userId=data.user.uid
 
-		return data.user.getIdToken()
+// 		return data.user.getIdToken()
 
-	}).then(Idtoken=>{
+// 	}).then(Idtoken=>{
 
-		token=Idtoken;
+// 		token=Idtoken;
 
-		const userCredentials={
+// 		const userCredentials={
 
-			handle:newUser.handle,
-			email:newUser.email,
-			createdAt:new Date().toISOString(),
-			imageUrl:`https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${noImg}?alt=media`,
-			userId:userId
-		}
+// 			handle:newUser.handle,
+// 			email:newUser.email,
+// 			createdAt:new Date().toISOString(),
+// 			imageUrl:`https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${img}?alt=media`,
+// 			userId:userId
+// 		}
 
-		return db.doc(`/users/${newUser.handle}`).set(userCredentials)
-
-
-	}).then((data)=>{
-
-		return response.status(201).json({token})
-
-	}).
+// 		return db.doc(`/users/${newUser.handle}`).set(userCredentials)
 
 
-	catch(err=>{
+// 	}).then((data)=>{
+
+// 		return response.status(201).json({token})
+
+// 	}).
+
+
+// 	catch(err=>{
 		
-		console.error(err)
+// 		console.error(err)
 
-		if(err.code!=='auth/email-already-in-us'){
-			return response.status(400).json({ email:'Email is already in use' })
-		}else{
+// 		if(err.code!=='auth/email-already-in-us'){
+// 			return response.status(400).json({ email:'Email is already in use' })
+// 		}else{
 
-		return response.status(500).json({error:err.code});
+// 		return response.status(500).json({error:err.code});
         
-        }
+//         }
 
-	})
+// 	})
 
-})
-
-
-
-
+// })
 
 
 exports.api=functions.region('asia-south1').https.onRequest(app)

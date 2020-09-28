@@ -1,7 +1,5 @@
+const {db,admin}=require('../util/admin')
 
-const admin=require('firebase-admin')
-
-const db=admin.firestore()
 
 exports.getAllScreams=(request,response)=>{
 	db
