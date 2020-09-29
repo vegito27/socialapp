@@ -19,9 +19,9 @@ const app=express()
 const db=admin.firestore()
 
 
-const { getAllScreams,postOneScream } = require('./handlers/screams')
+const { getAllScreams,postOneScream,getScreams,commentOnScream,likeScream,unlikeScream } = require('./handlers/screams')
 
-const { login,signup,ImageUpload } =require('./handlers/users')
+const { login,signup,ImageUpload,addUserDetails,getAuthenticatedUser } =require('./handlers/users')
 
 const {isEmpty,isEmail,FBAuth } = require('./handlers/auth')
 
@@ -31,11 +31,23 @@ app.get('/screams',getAllScreams)
 
 app.post('/screams',FBAuth,postOneScream)
 
+app.get('/scream/:screamId',getScreams)
+
+app.get('/scream/:screamId/like',FBAuth,likeScream)
+
+app.get('/scream/:screamId/unlike',FBAuth,unlikeScream)
+
+app.post('/scream/:screamId/comment',FBAuth,commentOnScream)
+
 app.post('/login',login)
 
 app.post('/signup',signup)
 
 app.post('/user/image',FBAuth,ImageUpload)
+
+app.post('/user',FBAuth,addUserDetails)
+
+app.get('/user',FBAuth,getAuthenticatedUser)
 
 
 // app.post('/signup',(request,response)=>{
