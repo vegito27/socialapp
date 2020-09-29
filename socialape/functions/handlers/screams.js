@@ -173,31 +173,37 @@ exports.commentOnScream=(request,response)=>{
 
 exports.likeScream=(request,response)=>{
 
-	const likeDocument=db.collection('likes').where('userHandle','==',request.user.handle)
-
-	.where('screamId','==',request.params.screamId).limit(1)
+	const likeDocument=db
+	.collection('likes')
+	.where('userHandle','==',request.user.handle)
+	.where('screamId','==',request.params.screamId)
+	.limit(1)
 
 	const screamDocument=db.doc(`/screams/${request.params.screamId}`)
 
-	let screamData
+	let screamData={};
 
 
-	screamDocument
-	.get()
+	screamDocument.get()
 	.then((doc)=>{
 
 		if(doc.exists){
 
 			screamData=doc.data()
+
+			console.log(screamData)
+
 			screamData.screamId=doc.id
 
 			return likeDocument.get()
-		}else{
+		}
+		else{
 
 			return response.status(404).json({error:'Scream not found'})
 
 		}
 	}).then(data=>{
+
 
 		if(data.empty){
 
@@ -219,7 +225,8 @@ exports.likeScream=(request,response)=>{
 
 			})
 
-		}else{
+		}
+		else{
 
 			return response.status(400).json({error:'Scream already liked'})
 		}
@@ -271,13 +278,13 @@ exports.unlikeScream=(request,response)=>{
 
 		}else{
 
-			return db.doc(`/likes/${data.docs[0].data().id}`)
+			return db.doc(`/likes/${data.docs[0].id}`)
 			.delete()
 			.then(()=>{
 
 				screamData.likeCount--;
 
-				return screamDocument.update({likeCount:screamData.likeCount}) 
+				return screamDocument.update({ likeCount:screamData.likeCount }) 
 			})
 			.then(()=>{
 
