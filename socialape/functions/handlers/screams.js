@@ -62,12 +62,13 @@ exports.postOneScream=(request,response)=>{
 
 		resScream.screamId=doc.id;
 
-		response.json(resScream) 
+		return response.json(resScream) 
 
 
 	;})
 
-	.catch(err=>{ response.status(500).json({error:'something went wrong'});
+	.catch(err=>{ 
+		response.status(500).json({error:'something went wrong'});
 
 		console.error(err)
 	})
@@ -155,9 +156,15 @@ exports.commentOnScream=(request,response)=>{
 			return response.status(404).json({error:"Scream not found"})
 		}
 
-		return db.collection('comments').add(newComment)
-	
-	}).then(()=>{
+		return doc.ref.update({commentCount:doc.data().commentCount+1})
+
+	})
+	.then(()=>{
+
+		 return db.collection('comments').add(newComment)
+	})
+
+	.then(()=>{
 
 	    return response.json(newComment)
 
@@ -288,7 +295,7 @@ exports.unlikeScream=(request,response)=>{
 			})
 			.then(()=>{
 
-				response.json(screamData)
+			return response.json(screamData)
 
 			})
 		}
@@ -300,9 +307,43 @@ exports.unlikeScream=(request,response)=>{
 		response.status(500).json({error : err.code})
 
 	})
-
 }
 
+exports.deleteScream=(request,response)=>{
+
+	const docs=db.doc(`/screams/${request.params.screamId}`);
+
+	docs
+	.get()
+	.then(doc=>{
+
+		if(!doc.exists){
+			return response.status(404).json({error:"Scream not found"});
+
+		}
+
+		if(doc.data().userHandle !== request.user.handle){
+
+			return response.status(403).json({error:"Unauthorized"})
+		
+		}else{
+
+			return docs.delete()
+
+		}
+
+	})
+	.then(()=>{
+
+		return response.json({message:"Scream deleted Successfully"})
+	
+	})
+	.catch(err=>{
+		console.error(err)
+		return response.status(500).json({error:err.code}) 
+	})
+
+}
 
 
 

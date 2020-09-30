@@ -11,7 +11,7 @@ const {db,admin}=require('../util/admin')
 
 exports.isEmail=(email)=>{
 
-		const regex="^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$";
+		const regex=/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 		if(email.match(regex)) return true
 
@@ -41,7 +41,7 @@ exports.FBAuth=(request,response,next)=>{
 
 		request.user=decodedToken
 
-		console.log(decodedToken)
+		// console.log(decodedToken)
 
 		return db.collection('users').where('userId','==',request.user.uid).limit(1).get()
 
@@ -49,6 +49,8 @@ exports.FBAuth=(request,response,next)=>{
 
 
 		request.user.handle=data.docs[0].data().handle;
+
+		request.user.imageUrl=data.docs[0].data().imageUrl
 
 
 		return next()
