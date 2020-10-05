@@ -1,16 +1,19 @@
 import React ,{Component} from 'react';
 import './App.css';
-import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider'
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme'
-
-
 import {BrowserRouter as Router ,Switch,Route} from 'react-router-dom'
-
 import Home from './pages/home'
 import Login from './pages/login'
 import SignUp from './pages/signup'
 import Navbar from './components/navbar'
-
+import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles'
+import jwtDecode from 'jwt-decode'
+import AuthRoute from './util/AuthRoute' 
+import {Provider} from 'react-redux'
+import store from './redux/store'
+import {SET_AUTHENTICATED} from './redux/types'
+import {logoutUser,getUserData} from './redux/actions/userActions'
+import axios from 'axios'
 
 
 const theme=createMuiTheme({
@@ -32,8 +35,72 @@ const theme=createMuiTheme({
   },typography:{
     useNextVariants:true
 
+  },
+  form:{
+    textAlign:'center',
+    width:"40%",
+    margin:"auto"
+  },
+
+  image:{
+    margin:'20px auto 20px auto'
+  },
+  pageTitle:{
+
+    margin:'10px auto 10px auto'
   }
+  ,textField:{
+
+    margin:'10px auto 10px auto'
+  },
+  button:{
+    margin:'20px',
+    position:'relative'
+  },
+  customError:{
+    color:'red',
+    fontSize:'0.8rem',
+    marginTop:10
+  },
+  progress:{
+    position:'absolute'
+  }
+
+
 })
+
+let authenticated;
+
+const token=localStorage.FBIdToken
+
+if(token){
+
+  const decodedToken=jwtDecode(token)
+
+
+  if(decodedToken.exp*1000 <Date.now()){
+
+    store.dispatch(logoutUser())
+
+     authenticated=false
+
+    window.location.href='/login'
+
+  }else{
+
+    store.dispatch({type:SET_AUTHENTICATED})
+
+    axios.defaults.headers.common['Authorization']=token
+
+
+    store.dispatch(getUserData() )
+
+  }
+
+  console.log(decodedToken)
+
+}
+
 
 class App extends Component{
 
@@ -41,6 +108,7 @@ class App extends Component{
 
   return (
     <MuiThemeProvider theme={theme}>
+    <Provider store={store}>
     <div className="App">
     <Router>
 
@@ -49,13 +117,17 @@ class App extends Component{
 
     <Switch>
         <Route exact path="/" component={Home}/>
-        <Route exact path="/login" component={Login}/>
-        <Route exact path="/signup" component={SignUp}/>
+
+        <AuthRoute exact path="/login" component={Login} authenticated={authenticated} />
+
+        <AuthRoute exact path="/signup" component={SignUp}  authenticated={authenticated}/>
+
     </Switch>
     
     </div>
     </Router>
     </div>
+    </Provider>
     </MuiThemeProvider>
   ); 
  }
