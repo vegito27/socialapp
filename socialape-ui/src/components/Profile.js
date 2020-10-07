@@ -15,6 +15,10 @@ import IconButton from '@material-ui/core/IconButton'
 import EditIcon from '@material-ui/icons/Edit'
 import Tooltip from '@material-ui/core/Tooltip'
 import {logoutUser,uploadImage } from '../redux/actions/userActions'
+import KeyboardReturn from '@material-ui/icons/KeyboardReturn'
+import EditDetails from '../components/EditDetails'
+import MyButton from '../util/MyButton'
+
 
 
 const styles = {
@@ -22,7 +26,8 @@ const styles = {
   	paddingTop:10,
     paddingBottom:0,
     marginLeft:30,
-    width:350 
+    width:350,
+    height:450 
   },
   profile: {
     "& .image-wrapper": {
@@ -44,11 +49,14 @@ const styles = {
     "& .profile-details": {
       textAlign: "center",
       "& span, svg": {
-        verticalAlign: "middle"
+        verticalAlign: "middle",
+
       },
       "& a": {
-        color: "primary"
+        color: "#00bcd4"
       }
+
+
     },
     "& hr": {
       border: "none",
@@ -89,17 +97,20 @@ class Profile extends React.Component {
 
 	}
 
+	handleLogout=()=>{
+
+		this.props.logoutUser();
+
+	}
+
 	handleEditPicture=()=>{
 
 
 		const fileInput=document.getElementById('imageInput')
 
-		fileInput.click()
+		fileInput.click();
 
 	}
-
-
-
 
 
 	render() {
@@ -115,30 +126,30 @@ class Profile extends React.Component {
 			<Paper className={classes.paper} >
 			    <div className={classes.profile}>
 			        <div className="image-wrapper">
+
 			            <img src={imageUrl} className="profile-image" alt="profile" />
+
 			            <input type="file" id="imageInput" hidden="hidden" onChange={this.handleImageChange}/>
 
-			            <Tooltip title="Edit profile picture" placement="top">
+			            <MyButton tip="Edit Profile picture" onClick={this.handleEditPicture} btnClassName="button">
 
-			                <IconButton onClick={this.handleEditPicture} className="button" >
-			                    <EditIcon color="primary" />
-			                </IconButton>
+				            <EditIcon color="primary" />
 
-			            </Tooltip>
-			            
+			            </MyButton>
+     
 			        </div>
+
 			         <hr />
+
 			        <div className="profile-details">
-			        <MuiLink component={Link} to={`/users/${handle}`} color="primary" variant="h5">
-			            @{handle}
-			        </MuiLink>
-			        <hr />
+				        <MuiLink component={Link} to={`/users/${handle}`} color="primary" variant="h5"> @{handle} </MuiLink>
+				        <hr />
 
 			        {bio && <Typography variant="body2" >{bio}</Typography>}
 
 			        <hr />
 
-			        {location &&( 
+			        {location && ( 
 
 			        	<Fragment>
 			        	
@@ -151,22 +162,27 @@ class Profile extends React.Component {
 			        	{website && (
 
 			        		<Fragment>
-			        		<LinkIcon color="primary" />
-			        		<a href={website} target="_blank" rel="noopener noreferrer" >
-			        		{' '}{website} 
-
-			        		</a>
-
-			        		<hr / >
-
-
+				        		<LinkIcon color="primary" />
+				        		<a href={website} target="_blank" rel="noopener noreferrer" >{website} </a>
+			        		    <hr />
 			        		</Fragment>
+
 			        		)}
-
-
-			        	<CalendarToday color="primary" />{' '}<span>Joined {dayjs(createdAt).format('MMM YYYY ')  }</span>	
+				        	<CalendarToday color="primary" />{' '}<span>Joined {dayjs(createdAt).format('MMM YYYY ')  }</span>	
 
 			        </div>
+
+			        <Tooltip title="logout" placement="top">
+
+					    <IconButton onClick={this.handleLogout}>
+					        <KeyboardReturn color="primary" />
+				        </IconButton>
+
+			        </Tooltip>
+
+			        <EditDetails/>
+
+			        
 
 
 			    </div>
@@ -178,16 +194,15 @@ class Profile extends React.Component {
 
 			<Paper className={classes.paper}>
 
-			<Typography variant="body2" align="center">No Profile Found,please Login again</Typography>
+				<Typography variant="body2" align="center">No Profile Found,please Login again</Typography>
 
-			<div className={classes.buttons}>
+				<div className={classes.buttons}>
 
-			<Button variant="contained" color="primary" component={Link} to="/login">Login</Button>
+					<Button variant="contained" color="primary" component={Link} to="/login">Login</Button>
 
-			<Button variant="contained" color="secondary" component={Link} to="/signup">SignUp</Button>
+					<Button variant="contained" color="secondary" component={Link} to="/signup">SignUp</Button>
 
-
-			</div>
+				</div>
 
 			</Paper>
 

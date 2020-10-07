@@ -5,7 +5,7 @@ import {BrowserRouter as Router ,Switch,Route} from 'react-router-dom'
 import Home from './pages/home'
 import Login from './pages/login'
 import SignUp from './pages/signup'
-import Navbar from './components/navbar'
+import Navbar from './components/Navbar'
 import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles'
 import jwtDecode from 'jwt-decode'
 import AuthRoute from './util/AuthRoute' 
@@ -19,7 +19,6 @@ import axios from 'axios'
 const theme=createMuiTheme({
   palette:{
     primary:{
-
       light:"#33c9dc",
       main:"#00bcd4",
       dark:"#008394",
@@ -116,11 +115,11 @@ class App extends Component{
     <Navbar />
 
     <Switch>
-        <Route exact path="/" component={Home}/>
+        <Route exact path="/" component={Home} />
 
-        <AuthRoute exact path="/login" component={Login} authenticated={authenticated} />
+        <AuthRoute exact path="/login" component={Login}  />
 
-        <AuthRoute exact path="/signup" component={SignUp}  authenticated={authenticated}/>
+        <AuthRoute exact path="/signup" component={SignUp} />
 
     </Switch>
     
