@@ -26,14 +26,17 @@ const isEmpty=(string)=>{
 
 const isEmail=(email)=>{
 
-		const regex="^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$";
 
-		if(email.match(regex)) return true
+	 const regex=/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-		return false	
+	console.log(regex)
+
+	if(email.match(regex)) return true
+
+	return false	
 }
 
-
+//login api
 exports.login=(request,response)=>{
 
 	const user={
@@ -41,9 +44,6 @@ exports.login=(request,response)=>{
 		email:request.body.email,
 		password:request.body.password
 	}
-
-	console.log(user)
-
 
 	let errors={}
 
@@ -57,7 +57,9 @@ exports.login=(request,response)=>{
 	}	
 
 
-	firebase.auth().signInWithEmailAndPassword(user.email,user.password)
+	firebase
+	.auth()
+	.signInWithEmailAndPassword(user.email,user.password)
 	.then(data=>{
 		return data.user.getIdToken();
 	}).
@@ -66,15 +68,18 @@ exports.login=(request,response)=>{
 		return response.json({token})
 	})
 	.catch(err=>{
-		console.error(err)
 
-		if(err.code==='auth/wrong-password'){
-			return response.status(403).json({general:'Wrong credentials,Please try again'})
-		}else return response.status(500).json({error:err.code}) 
+		if(err){
+
+		     console.error("error login", error);
+
+			return response.status(403).json({general:"Wrong Credentials,Please try again!"})
+		}
 
 	})
 }
 
+//signup with authentication
 
 exports.signup=(request,response)=>{
 
@@ -97,7 +102,7 @@ exports.signup=(request,response)=>{
 
 	}else if(!isEmail(newUser.email)){
 
-		errors.email='must be a valid email address'
+		errors.email='Must be a valid email address'
 
 	} 
 
@@ -154,20 +159,20 @@ exports.signup=(request,response)=>{
 
 	}).catch(err=>{
 		
-		console.error(err)
+		console.log("Error signing up",err)
 
 		if(err.code!=='auth/email-already-in-us'){
 			return response.status(400).json({ email:'Email is already in use' })
 		}else{
 
-		return response.status(500).json({error:err.code});
+		return response.status(500).json({general:'Something went wrong,Please try again'} );
         
         }
 
 	})
 }
 
-
+//upload the image
 exports.ImageUpload=(request,response)=>{
 
 	const BusBoy=require('busboy')
@@ -229,9 +234,9 @@ exports.ImageUpload=(request,response)=>{
 	})
 	.then(()=>{
 
-		const ImageUrl=`https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`
+		const imageUrl=`https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`
 
-		return db.doc(`/users/${request.user.handle}`).update({ ImageUrl })
+		return db.doc(`/users/${request.user.handle}`).update({ imageUrl })
 
 
 	}).then(()=>{
@@ -250,15 +255,210 @@ exports.ImageUpload=(request,response)=>{
 
 	busboy.end(request.rawBody)
 
+}
 
 
+reduceUserDetails=data=>{
+
+	let userDetails={}
+
+	if(!isEmpty(data.bio.trim())) userDetails.bio=data.bio
+
+	if(!isEmpty(data.website.trim())){
+
+
+		if(data.website.trim().substring(0,4)!=='http'){
+
+			userDetails.website=`http://${data.website.trim()}`
+
+		}else{
+			userDetails.website=data.website
+		}
+	}	
+
+	if(!isEmpty(data.location.trim())) userDetails.location=data.location
+
+	return userDetails
+
+}
+
+exports.getAuthenticatedUser=(request,response)=>{
+
+	let responseData={}
+
+
+	db
+	.doc(`/users/${request.user.handle}`)
+	.get()
+	.then((doc)=>{
+
+
+		if(doc.exists){
+
+			responseData.credentials=doc.data();
+
+		}
+
+		return db.collection('likes').where('userHandle','==',request.user.handle).get()
+        
+	})
+	.then( data=>{
+
+		responseData.likes=[] 
+
+		data.forEach(doc=>{
+
+			responseData.likes.push(doc.data())
+
+		});
+
+		return db.collection('notifications').where('recipient','==',request.user.handle).orderBy('createdAt','desc').limit(10).get()
+
+	}).then(data=>{
+
+		responseData.notifications=[]
+
+
+		data.forEach(doc=>{
+
+			responseData.notifications.push({
+
+				recipient:doc.data().recipient,
+				
+				sender:doc.data().sender,
+				
+				createdAt:doc.data().createdAt,
+				
+				screamId:doc.data().screamId,
+				
+				type:doc.data().type,
+				
+				read:doc.data().read,
+
+				notificationId:doc.id
+				
+			})
+
+		})
+
+		return response.json(responseData) 
+
+	}).catch(err=>{
+
+		console.error(err)
+
+		return response.status(500).json({error:err.code})
+
+	})
+}
+
+
+//add user details
+exports.addUserDetails=(request,response)=>{
+
+	let userDetails=reduceUserDetails(request.body)
+
+	db.doc(`/users/${request.user.handle}`).update(userDetails)
+	.then(()=>{
+
+		return response.json({message:"Details Added Successfully"})
+
+	}).catch(err=>{
+
+		console.error(err)
+
+		return response.status(500).json({error:err.code})
+
+
+	})
+
+}
+
+exports.getUserDetails=(request,response)=>{
+
+	let userData={};
+
+	db.doc(`/users/${request.params.handle}`)
+	.get()
+	.then( doc=>{
+
+		if(doc.exists){
+
+			userData.user=doc.data()
+
+			return db
+			       .collection('screams')
+			       .where('userHandle','==',request.params.handle)
+			       .orderBy('createdAt','desc')
+			       .get()
+		}else{
+			return response.status(404).json({message:"user does not exists"})
+
+
+
+		}
+	})
+	.then(data=>{
+
+		userData.screams=[]
+
+		data.forEach(doc=>{
+
+			userData.screams.push({
+
+				body:doc.data().body,
+				createdAt:doc.data().createdAt ,
+				userHandle:doc.data().userHandle,
+				userImage:doc.data().userImage,
+				likeCount:doc.data(). likeCount,
+				commentCount:doc.data().commentCount,
+				screamId:doc.Id
+
+			})
+
+		})
+
+		return response.json(userData)
+	})
+	.catch(err=>{
+
+		console.error(err)
+
+		return response.status(500).json({error:err.code})
+
+	})
 
 }
 
 
+exports.marknotificationsRead=(request,response)=>{
+
+	let batch=db.batch();
 
 
+	request.body.forEach(notificationId=>{
 
+		const notification=db.doc(`/notifications/${notificationId}`)
+
+		batch.update(notification,{read:true})
+
+	})
+
+	batch.commit()
+	.then(()=>{
+
+			return response.json({message:'notifications marked as read'} )
+
+
+		}).catch(err=>{
+
+			console.error(err)
+
+			 return response.status(500).json({error:err.code})
+
+		})
+
+}
 
 
 

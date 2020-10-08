@@ -9,6 +9,8 @@ exports.getAllScreams=(request,response)=>{
 	.then(data=>{
 		let screams=[]
 
+		console.log(data)
+
 		data.forEach((doc)=>{
 
 			screams.push({
@@ -17,8 +19,10 @@ exports.getAllScreams=(request,response)=>{
 					scream:doc.data().scream,
 					userHandle:doc.data().userHandle,
 					createdAt:new Date().toISOString(),
+					userImage:doc.data().userImage, 
 					commentCount:doc.data().commentCount,
 					likeCount:doc.data().likeCount
+			
 			})
 
 		})
@@ -40,7 +44,7 @@ exports.postOneScream=(request,response)=>{
 
 	if(request.body.scream.trim()===''){
 
-		return response.status(400).json({body:'Body Must Not be Empty'})
+		return response.status(400).json({comment:'Body Must Not be Empty'})
 
 	}
 
@@ -54,7 +58,8 @@ exports.postOneScream=(request,response)=>{
 		likeCount:0
 	}
 
-	db.collection('screams')
+	db
+	.collection('screams')
 	.add(newScream)
 	.then(doc=>{ 
 
@@ -76,6 +81,7 @@ exports.postOneScream=(request,response)=>{
 }
 
 
+
 exports.getScreams=(request,response)=>{
 
 	let screamData={}
@@ -89,11 +95,8 @@ exports.getScreams=(request,response)=>{
 
 		screamData=doc.data()
 
-		console.log(doc.data())
+		screamData.screamId=request.params.screamId
 
-		screamData.screamId=doc.id
-
-		console.log(doc.Id)
 
 		return db.collection('comments').orderBy('createdAt','desc').where('screamId', '==',request.params.screamId).get()
 
@@ -114,7 +117,7 @@ exports.getScreams=(request,response)=>{
 
 		console.error(err)
 
-		response.status(500).json({error:err.code})
+		return response.status(500).json({error:err.code})
       })
     }
 
@@ -172,7 +175,7 @@ exports.commentOnScream=(request,response)=>{
 
 		console.error(err)
 
-		response.status(500).json({error:"Something went Wrong"})
+		return response.status(500).json({error:"Something went Wrong"})
 
 	})
 
@@ -184,7 +187,6 @@ exports.likeScream=(request,response)=>{
 	.collection('likes')
 	.where('userHandle','==',request.user.handle)
 	.where('screamId','==',request.params.screamId)
-	.limit(1)
 
 	const screamDocument=db.doc(`/screams/${request.params.screamId}`)
 
@@ -197,8 +199,6 @@ exports.likeScream=(request,response)=>{
 		if(doc.exists){
 
 			screamData=doc.data()
-
-			console.log(screamData)
 
 			screamData.screamId=doc.id
 
@@ -216,7 +216,7 @@ exports.likeScream=(request,response)=>{
 
 			return db.collection('likes').add({
 
-				screamId:request.params.screamId,
+				screamId:screamData.screamId,
 				userHandle:request.user.handle
 
 			})
@@ -320,9 +320,7 @@ exports.deleteScream=(request,response)=>{
 		if(!doc.exists){
 			return response.status(404).json({error:"Scream not found"});
 
-		}
-
-		if(doc.data().userHandle !== request.user.handle){
+		}else if(doc.data().userHandle !== request.user.handle){
 
 			return response.status(403).json({error:"Unauthorized"})
 		
@@ -344,23 +342,6 @@ exports.deleteScream=(request,response)=>{
 	})
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

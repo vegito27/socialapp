@@ -9,6 +9,7 @@ import PropTypes from 'prop-types'
 import AddIcon from '@material-ui/icons/Add'
 import HomeIcon from '@material-ui/icons/Home'
 import Notifications from '@material-ui/icons/Notifications'
+import PostScream from './PostScream'
 
 
 
@@ -29,9 +30,7 @@ render(){
         (
             <Fragment className="nav-container">
 
-                <MyButton tip="Post a Scream">
-                    <AddIcon  />
-                </MyButton>
+                <PostScream />
  
                 <Link to="/">
                     <MyButton tip="Home">

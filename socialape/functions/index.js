@@ -14,14 +14,10 @@ const serviceAccount = {
   "token_uri": "https://oauth2.googleapis.com/token",
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-zef08%40socialape-e3733.iam.gserviceaccount.com"
-
-
-
-
-
 }
-admin.initializeApp({
 
+admin.initializeApp({
+ 
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://socialape-e3733.firebaseio.com"
 
@@ -36,13 +32,13 @@ const db=admin.firestore()
 
 const { getAllScreams,postOneScream,getScreams,commentOnScream,likeScream,unlikeScream,deleteScream } = require('./handlers/screams')
 
-const { login,signup,ImageUpload,addUserDetails,getAuthenticatedUser } =require('./handlers/users')
+const { login,signup,ImageUpload,addUserDetails,getAuthenticatedUser,getUserDetails,marknotificationsRead } =require('./handlers/users')
 
 const {isEmpty,isEmail,FBAuth } = require('./handlers/auth')
 
 app.get('/screams',getAllScreams)
 
-app.post('/screams',FBAuth,postOneScream)
+app.post('/scream',FBAuth,postOneScream)
 
 app.get('/scream/:screamId',getScreams)
 
@@ -54,6 +50,7 @@ app.post('/scream/:screamId/comment',FBAuth,commentOnScream)
 
 app.delete('/scream/:screamId/',FBAuth,deleteScream)
 
+
 app.post('/login',login)
 
 app.post('/signup',signup)
@@ -63,6 +60,10 @@ app.post('/user/image',FBAuth,ImageUpload)
 app.post('/user',FBAuth,addUserDetails)
 
 app.get('/user',FBAuth,getAuthenticatedUser)
+
+app.get('/user/:userHandle',getUserDetails)
+
+app.post('/notifications/',FBAuth,marknotificationsRead)
 
 exports.api=functions.region('asia-south1').https.onRequest(app)
 
@@ -76,12 +77,11 @@ exports.createNotificationOnLikes=functions
 	db.doc(`/screams/${snapshot.data().screamId}`).get()
 	.then(doc=>{
 
-
 			return db.doc(`/notifications/${snapshot.id}`).set({
 
 				createdAt:new Date().toISOString(),
-				sender:doc.data().userHandle,
-				recipient:snapshot.data().userHandle,
+				sender:snapshot.data().userHandle,
+				recipient:doc.data().userHandle,
 				type:'like',
 				read:false,
 				screamId:doc.id
@@ -114,8 +114,8 @@ exports.createNotificationOnComments=functions
 			return db.doc(`/notifications/${snapshot.id}`).set({
 
 				createdAt:new Date().toISOString(),
-				sender:doc.data().userHandle,
-				recipient:snapshot.data().userHandle,
+				sender:snapshot.data().userHandle,
+				recipient:doc.data().userHandle,
 				type:'comment',
 				read:false,
 				screamId:doc.id
@@ -157,26 +157,96 @@ functions.region('asia-south1')
 })
 
 
+exports.onUserImageChange=functions
+.region('asia-south1')
+.firestore
+.document('/users/{userId}')
+.onUpdate(change=>{
 
 
+	if(change.before.data().imageUrl !== change.after.data().imageUrl){
+
+		console.log('Image has changed')
+
+		const batch=db.batch();
+
+		return db
+		.collection('screams')
+		.where('userHandle','==',change.before.data().handle)
+		.get()
+		.then(data=>{
+
+			data.forEach(doc=>{
+
+				const scream=db.doc(`/screams/${doc.id}`)
+
+				batch.update(scream,{userImage:change.after.date().imageUrl})
+
+			})
+
+			return batch.commit();
+
+		})
+		.catch(error => {
+          console.error("error in onUserImageTrigger", error);
+        });
+	} else return true
+
+})
+
+exports.onScreamDelete=
+functions
+.region('asia-south1')
+.firestore
+.document('/screams/{screamId}')
+.onDelete((snapshot,context)=>{
+
+	const screamId=context.params.screamId
+
+	const batch=db.batch()
+	
+	return db
+	.collection('comments')
+	.where('screamId','==',screamId)
+	.get()
+	.then(data=>{
+
+		data.forEach(doc=>{
+
+			batch.delete(db.doc(`/comments/${doc.id}`))
+
+		})
+
+		return db.collection('likes').where('screamId','==',screamId).get()
+
+	})
+	.then(data=>{
+
+		data.forEach(doc=>{
+
+			batch.delete(db.doc(`/likes/${doc.id}`))
+
+		})
+
+		return db.collection('notifications').where('screamId','==',screamId).get()
 
 
+	})
+	.then(data=>{
+
+		data.forEach(doc=>{
+
+			batch.delete(db.doc(`/notifications/${doc.id}`))
+
+		})
+
+		return batch.commit()
 
 
+	}).
+	catch(err=>console.error(err))      
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+}) 
 
 
 

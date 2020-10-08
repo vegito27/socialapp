@@ -7,7 +7,7 @@ import Grid from '@material-ui/core/Grid'
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button'
 import axios from 'axios'
-import {Link} from '@material-ui/core'
+import {Link} from 'react-router-dom'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import {connect}  from 'react-redux'
 import {signupUser} from '../redux/actions/userActions' 
@@ -56,7 +56,6 @@ form:{
  			password:'',
  			confirmPassword:'',
  			handle:'',
- 			loading:false,
  			errors:{}
  		}
 
@@ -70,9 +69,6 @@ form:{
 
         }
  	}
-
-
-
 
  	handleSubmit=(event)=>{
 
@@ -132,7 +128,7 @@ form:{
 			         
 			        className={classes.textField} value={this.state.password} onChange={this.handleChange} fullWidth /> 
 
-			        <TextField id="confirmPassword" name="confirmPassword" type="password" label="confirm Password" helperText={errors.confirmPassword} error={errors.confirmPassword ? true :false}
+			        <TextField id="confirmPassword" name="confirmPassword" type="password" label="Confirm Password" helperText={errors.confirmPassword} error={errors.confirmPassword ? true :false}
 			         
 			        className={classes.textField} value={this.state.confirmPassword} onChange={this.handleChange} fullWidth /> 
 
@@ -144,7 +140,7 @@ form:{
 
 			        {errors.general && (<Typography variant="body2" className={classes.customError}>{errors.general}</Typography>)}
 
-			        <Button type="submit" variant="contained" value="Submit" disabled={loading} color="primary" className={classes.button}>SignUp {loading && <CircularProgress size={30} className={classes.progress} />}</Button>
+			        <Button type="submit" variant="contained" value="Submit" disabled={loading} color="primary" className={classes.button}>SignUp {loading && <CircularProgress size={30} className={classes.progress} thickness={7}/>}</Button>
 			        <br />
 
 			        <small>Already Have an account ? Login <Link to="/login"> here</Link></small>
