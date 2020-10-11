@@ -2,9 +2,9 @@ import React ,{Component} from 'react';
 import './App.css';
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme'
 import {BrowserRouter as Router ,Switch,Route} from 'react-router-dom'
-import Home from './pages/home'
-import Login from './pages/login'
-import SignUp from './pages/signup'
+import Home from './pages/Home'
+import Login from './pages/Login'
+import SignUp from './pages/Signup'
 import Navbar from './components/Navbar'
 import { ThemeProvider as MuiThemeProvider } from '@material-ui/core/styles'
 import jwtDecode from 'jwt-decode'
@@ -14,6 +14,7 @@ import store from './redux/store'
 import {SET_AUTHENTICATED} from './redux/types'
 import {logoutUser,getUserData} from './redux/actions/userActions'
 import axios from 'axios'
+import user from "./pages/user";
 
 
 const theme=createMuiTheme({
@@ -107,30 +108,30 @@ class App extends Component{
 
   return (
     <MuiThemeProvider theme={theme}>
-    <Provider store={store}>
-    <div className="App">
-    <Router>
+      <Provider store={store}>
+        <div className="App">
+          <Router>
+            <div className="container">   
+              <Navbar />
+              <Switch>
+                  <Route exact path="/" component={Home} />
 
-    <div className="container">
-    <Navbar />
+                  <AuthRoute exact path="/login" component={Login}  />
 
-    <Switch>
-        <Route exact path="/" component={Home} />
+                  <AuthRoute exact path="/signup" component={SignUp} />
 
-        <AuthRoute exact path="/login" component={Login}  />
-
-        <AuthRoute exact path="/signup" component={SignUp} />
-
-    </Switch>
-    
-    </div>
-    </Router>
-    </div>
-    </Provider>
+                  <Route exact path="/users/:handle" component={user} />
+                          
+                  <Route exact path="/users/:handle/scream/:screamId" component={user} />
+                        
+              </Switch>
+            </div>
+          </Router>
+        </div>
+      </Provider>
     </MuiThemeProvider>
   ); 
  }
-
 }
 
 export default App;

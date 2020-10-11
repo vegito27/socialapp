@@ -32,7 +32,7 @@ const db=admin.firestore()
 
 const { getAllScreams,postOneScream,getScreams,commentOnScream,likeScream,unlikeScream,deleteScream } = require('./handlers/screams')
 
-const { login,signup,ImageUpload,addUserDetails,getAuthenticatedUser,getUserDetails,marknotificationsRead } =require('./handlers/users')
+const { login,signup,uploadImage,addUserDetails,getAuthenticatedUser,getUserDetails,marknotificationsRead } =require('./handlers/users')
 
 const {isEmpty,isEmail,FBAuth } = require('./handlers/auth')
 
@@ -55,7 +55,7 @@ app.post('/login',login)
 
 app.post('/signup',signup)
 
-app.post('/user/image',FBAuth,ImageUpload)
+app.post('/user/image',FBAuth,uploadImage)
 
 app.post('/user',FBAuth,addUserDetails)
 
@@ -74,9 +74,10 @@ exports.createNotificationOnLikes=functions
 .document('likes/{id}')
 .onCreate((snapshot)=>{ 
 
-	db.doc(`/screams/${snapshot.data().screamId}`).get()
+	db.doc(`/screams/${snapshot.data().screamId}`)
+	.get()
 	.then(doc=>{
-
+	
 			return db.doc(`/notifications/${snapshot.id}`).set({
 
 				createdAt:new Date().toISOString(),
@@ -86,17 +87,13 @@ exports.createNotificationOnLikes=functions
 				read:false,
 				screamId:doc.id
 
-			}) 
+			})
 		
-	})
-	.then(()=>{
-
-		return ;
+		
 	})
 	.catch(err=>{
 
-		console.error(err)
-		return ;
+		console.log("error in like notifications",err)
 	})
 })
 
@@ -122,14 +119,9 @@ exports.createNotificationOnComments=functions
 
 			}) 
 	})
-	.then(()=>{
-
-		return ;
-	})
 	.catch(err=>{
 
 		console.error(err)
-		return ;
 	})
 
 })
@@ -143,15 +135,11 @@ functions.region('asia-south1')
 
 	db.doc(`/notifications/${snapshot.id}`)
 	.delete()
-	.then(()=>{
-
-		return  
-	})
+	
 	.catch(err=>{
 	
-	console.error(err)
-	return 
-
+		console.error(err)
+	
 	})
 
 })
@@ -247,12 +235,4 @@ functions
 	catch(err=>console.error(err))      
 
 }) 
-
-
-
-
-
-
-
-
 

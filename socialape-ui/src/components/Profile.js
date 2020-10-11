@@ -142,7 +142,7 @@ class Profile extends React.Component {
 			         <hr />
 
 			        <div className="profile-details">
-				        <MuiLink component={Link} to={`/users/${handle}`} color="primary" variant="h5"> @{handle} </MuiLink>
+				        <MuiLink component={Link} to={`/user/${handle}`} color="primary" variant="h5"> @{handle} </MuiLink>
 				        <hr />
 
 			        {bio && <Typography variant="body2" >{bio}</Typography>}
@@ -168,7 +168,7 @@ class Profile extends React.Component {
 			        		</Fragment>
 
 			        		)}
-				        	<CalendarToday color="primary" />{' '}<span>Joined {dayjs(createdAt).format('MMM YYYY ')  }</span>	
+				        	<CalendarToday color="primary" />{' '}<span>Joined {dayjs(createdAt).format('MMM YYYY')}</span>	
 
 			        </div>
 
@@ -180,7 +180,7 @@ class Profile extends React.Component {
 
 			        </Tooltip>
 
-			        <EditDetails/>
+			        <EditDetails />
 
 			        
 
@@ -222,8 +222,6 @@ const mapStateToProps=state=>({
 })
 
 const mapActionsToProps={logoutUser,uploadImage}
-
-
 
 
 Profile.propTypes={

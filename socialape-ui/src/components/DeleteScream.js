@@ -70,6 +70,7 @@ class DeleteScream extends React.Component {
 					</DialogTitle>
 
 					<DialogActions>
+					
 						<Button onClick={this.handleClose} color="primary"  variant="contained">Cancel</Button>
 
 						<Button onClick={this.deleteScream} color="secondary"  variant="contained">Delete</Button>

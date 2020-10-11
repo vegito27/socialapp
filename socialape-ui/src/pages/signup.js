@@ -6,7 +6,6 @@ import Typography from '@material-ui/core/Typography'
 import Grid from '@material-ui/core/Grid'
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button'
-import axios from 'axios'
 import {Link} from 'react-router-dom'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import {connect}  from 'react-redux'
@@ -86,9 +85,7 @@ form:{
   		}
 
  		this.props.signupUser(newUserData,this.props.history) 
- 
  	}
-
 
  	handleChange=(event)=>{
 
@@ -120,28 +117,42 @@ form:{
 			    
 			    <form noValidate onSubmit={this.handleSubmit} >
 			        
-			        <TextField id="email" name="email" type="email" label="Email" helperText={errors.email} error={errors.email ? true :false}
+			        <TextField id="email" name="email" type="email" label="Email" 
+				        helperText={errors.email} error={errors.email ? true :false}
+				        className={classes.textField} value={this.state.email}
+				         onChange={this.handleChange} fullWidth /> 
 			        
-			        className={classes.textField} value={this.state.email} onChange={this.handleChange} fullWidth /> 
-			        
-			        <TextField id="password" name="password" type="password" label="Password" helperText={errors.password} error={errors.password ? true :false}
-			         
-			        className={classes.textField} value={this.state.password} onChange={this.handleChange} fullWidth /> 
+			        <TextField id="password" name="password" type="password" 
+				        label="Password" helperText={errors.password} 
+				        error={errors.password ? true :false}		         
+				        className={classes.textField} value={this.state.password}
+				        onChange={this.handleChange} fullWidth /> 
 
-			        <TextField id="confirmPassword" name="confirmPassword" type="password" label="Confirm Password" helperText={errors.confirmPassword} error={errors.confirmPassword ? true :false}
-			         
-			        className={classes.textField} value={this.state.confirmPassword} onChange={this.handleChange} fullWidth /> 
-
-
-			        <TextField id="handle" name="handle" type="text" label="Handle" helperText={errors.handle} error={errors.handle ? true :false}
-			         
-			        className={classes.textField} value={this.state.handle} onChange={this.handleChange} fullWidth/> 
+			        <TextField id="confirmPassword" name="confirmPassword" type="password" 
+				        label="Confirm Password" helperText={errors.confirmPassword} 
+				        error={errors.confirmPassword ? true :false}     
+				        className={classes.textField} 
+				        value={this.state.confirmPassword}
+				        onChange={this.handleChange} fullWidth /> 
 
 
-			        {errors.general && (<Typography variant="body2" className={classes.customError}>{errors.general}</Typography>)}
+			        <TextField id="handle" name="handle" type="text" label="Handle" 
+					    helperText={errors.handle} error={errors.handle ? true :false}	
+				        className={classes.textField} value={this.state.handle} 
+				        onChange={this.handleChange} fullWidth /> 
 
-			        <Button type="submit" variant="contained" value="Submit" disabled={loading} color="primary" className={classes.button}>SignUp {loading && <CircularProgress size={30} className={classes.progress} thickness={7}/>}</Button>
-			        <br />
+				        {
+				        errors.general && (
+			              <Typography variant="body2" className={classes.customError}>
+			                {errors.general}
+			              </Typography>
+				        )}
+			    
+			        <Button type="submit" variant="contained" value="Submit" 
+				        disabled={loading} color="primary" className={classes.button}>SignUp
+			            {loading && (<CircularProgress size={30} 
+			            className={classes.progress} thickness={7}/>)}</Button>
+			         <br />
 
 			        <small>Already Have an account ? Login <Link to="/login"> here</Link></small>
 
@@ -161,7 +172,7 @@ SignUp.propTypes={
 	classes:PropTypes.object.isRequired,
 	user:PropTypes.object.isRequired,
 	UI:PropTypes.object.isRequired,
-	logoutUser: PropTypes.func
+	signupUser: PropTypes.func.isRequired
  }
 
 const mapStateToProps=(state)=>({

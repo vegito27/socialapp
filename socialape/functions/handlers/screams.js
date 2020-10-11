@@ -24,7 +24,6 @@ exports.getAllScreams=(request,response)=>{
 					likeCount:doc.data().likeCount
 			
 			})
-
 		})
 
 		return response.json(screams);

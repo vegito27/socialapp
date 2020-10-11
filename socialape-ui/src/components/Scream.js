@@ -15,6 +15,8 @@ import ChatIcon from '@material-ui/icons/Chat'
 import FavoriteIcon from '@material-ui/icons/Favorite'
 import FavoriteBorder from '@material-ui/icons/FavoriteBorder'
 import DeleteScream from '../components/DeleteScream'
+import ScreamDialog from './ScreamDialog'
+import LikeButton from './LikeButton'
 
 const styles={
 
@@ -57,34 +59,13 @@ class Scream extends  React.Component {
     
 	render(){
 
+		console.log(this.props)
+
 		dayjs.extend(relativeTime)
 
 		const { classes,scream: {commentCount,createdAt,likeCount,scream,screamId,userHandle,userImage},user:{authenticated,credentials:{handle } } } = this.props;
 
-		const likeButton=!authenticated ? 
-                       (
-				    	<MyButton tip="like">
-					    	<Link to="/login">
-						    	<FavoriteBorder color="primary"/>
-					    	</Link>
-				    	</MyButton> ):
-
-				    ( this.likedScream() ?
-				        (
-					    	<MyButton tip="Undo like" onClick={this.unlikeScream} >
-						    	<FavoriteIcon color="primary" />
-					    	</MyButton> ):
-
-    		            (
-
-							<MyButton tip="Like" onClick={this.likeScream} >
-						    	<FavoriteBorder color="primary" />
-							</MyButton>
-
-    		            )
-    	            )
-
-    	    const deleteButton=authenticated && userHandle===handle ?(<DeleteScream screamId={screamId} />):null      
+    	const deleteButton=authenticated && userHandle===handle ?(<DeleteScream screamId={screamId} />):null      
 
 		  return (
 		    <div>
@@ -95,7 +76,7 @@ class Scream extends  React.Component {
 			            {deleteButton}
 			            <Typography variant="body2" color="textSecondary">{dayjs(createdAt).fromNow()} </Typography>
 			            <Typography variant="body1">{this.props.scream.scream}</Typography>
-			            {likeButton}
+			           <LikeButton screamId={screamId} />
 			            <span>{likeCount} Likes</span>
 
 			            <MyButton tip="Comments">
@@ -103,6 +84,8 @@ class Scream extends  React.Component {
 			            </MyButton>
 
 			            <span>{commentCount}</span>
+
+			            <ScreamDialog screamId={screamId} userHandle={userHandle} />
 			           
 			        </CardContent>
 			    </Card>
@@ -130,7 +113,6 @@ const mapStateToProps=state=>({
 
 
 const mapActionsToProps={
-
 	likeScream,
 	UnlikeScream
 }

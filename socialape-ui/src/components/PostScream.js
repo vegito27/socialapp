@@ -10,9 +10,12 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import EditIcon from '@material-ui/icons/Edit'
+
 import MyButton from '../util/MyButton'
 import CircularProgress from '@material-ui/core/CircularProgress'
+
 import {postScream} from '../redux/actions/dataActions'
+
 import AddIcon from '@material-ui/icons/Add'
 import CloseIcon from '@material-ui/icons/Close'
 
@@ -32,7 +35,7 @@ textField: {
   },
   closeButton: {
     position: "absolute",
-    left: "80%",
+    left: "90%",
     top: "6%"
   }
 }
@@ -47,7 +50,7 @@ class PostScream extends Component{
 	}
 
 	state={
-		open:'',
+		open:false,
 		scream:'',
 		errors:{}
 	}
@@ -60,6 +63,7 @@ class PostScream extends Component{
     // scream posted successfuly
     if (!nextProps.UI.errors && !nextProps.UI.loading) {
       this.setState({ scream: "" ,open:false,errors:{}});
+      this.handleClose()
       
     }
   }
@@ -86,11 +90,9 @@ class PostScream extends Component{
 
 		const {errors }=this.state
 
-
 		const {classes,UI:{loading}}=this.props
 
-		console.log(this.props)
-
+		
 		return (
 
 			<Fragment>
@@ -100,9 +102,16 @@ class PostScream extends Component{
 
 				</MyButton>
 
-				<Dialog open={this.state.open} onClose={this.handleClose} maxWidth="lg">
+				<Dialog open={this.state.open} 
+					onClose={this.handleClose} 
+					fullWidth
+					maxWidth="sm">
 
-					<MyButton tip="Close" onClick={this.handleClose} tipClassName={classes.closeButton} >
+					<MyButton 
+						tip="Close" 
+						onClick={this.handleClose} 
+						tipClassName={classes.closeButton} >
+
 						<CloseIcon />
 					</MyButton>
 
@@ -111,22 +120,26 @@ class PostScream extends Component{
 					<DialogContent>
 
 						<form onSubmit={this.handleSubmit}>
-
 							 
-							<TextField name="scream" type="text" label="add Scream.." multiline rows="2" placeholder="Scream at your fellow apes" className={classes.textField}
-								errors={errors.scream ? true:false} helperText={errors.scream} onChange={this.handlechange} fullWidth />
+							<TextField name="scream" type="text" 
+								label="add Scream.." multiline rows="2" 
+								placeholder="Scream at your fellow apes" 
+								className={classes.textField}
+								errors={errors.scream ? true:false} 
+								helperText={errors.scream} 
+								onChange={this.handlechange} 
+								fullWidth />
 
-								<Button type="submit" variant="contained" color="primary" className={classes.submitButton} disabled={loading} >
+							<Button type="submit" variant="contained" color="primary" 
+								className={classes.submitButton} disabled={loading} >
                                 
-                                    Post { ( loading && <CircularProgress className={classes.progress} size={30} thickness={7} />) }
+                                Post { ( loading && <CircularProgress className={classes.progress} size={30} thickness={7} />) }
                                 
                                 </Button>
 						</form>
 
 					</DialogContent>
-
 				</Dialog>
-
 			</Fragment>
 
 		)
@@ -137,14 +150,12 @@ class PostScream extends Component{
 
 
 PostScream.propTypes={
-
 	postScream:PropTypes.func.isRequired,
 	UI:PropTypes.object.isRequired
 
 }
 
 const mapStateToProps=(state)=>({
-
 	UI:state.UI
 
 })

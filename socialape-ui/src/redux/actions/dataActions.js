@@ -1,4 +1,6 @@
-import { SET_SCREAMS, LOADING_DATA, LIKE_SCREAM, UNLIKE_SCREAM,DELETE_SCREAM ,CLEAR_ERRORS,SET_ERRORS,POST_SCREAM,LOADING_UI,STOP_LOADING_UI } from '../types'
+import { SET_SCREAMS, LOADING_DATA,LIKE_SCREAM, UNLIKE_SCREAM,DELETE_SCREAM,CLEAR_ERRORS,
+	    SET_ERRORS,POST_SCREAM,LOADING_UI,STOP_LOADING_UI,SET_SCREAM ,SUBMIT_COMMENTS } from '../types'
+
 import axios from 'axios'
 
 export const getScreams=()=>dispatch=>{
@@ -7,6 +9,7 @@ export const getScreams=()=>dispatch=>{
 
 	axios.get('/screams')
 	.then(res=>{
+		
 
 		dispatch({
 			type:SET_SCREAMS,
@@ -24,25 +27,22 @@ export const getScreams=()=>dispatch=>{
 	})
 }
 
-// export const getScream=screamId=>dispatch=>{
+export const getScream=screamId=>dispatch=>{
 
-// 	dispatch({type:LOADING_UI})
+	dispatch({type:LOADING_UI})
 
-// 	axios.get(`scream/${screamId}`)
-// 	.then(res=>{
+	axios.get(`scream/${screamId}`)
+	.then(res=>{
 
-// 		dispatch({
-// 			type:SET_SCREAM,
-// 			payload:res.data
-// 		})
+		dispatch({
+			type:SET_SCREAM,
+			payload:res.data
+		})
 
-// 		dispatch({type:STOP_LOADING_UI})
-// 	})
-// 	.catch(err=>console.log(err))
-
-
-
-// }
+		dispatch({type:STOP_LOADING_UI})
+		
+	}).catch(err=>console.log(err))
+}
 
 
 export const likeScream=screamId=>dispatch=>{
@@ -102,6 +102,7 @@ export const deleteScream=screamId=>dispatch=>{
 export const postScream=newScream=>(dispatch)=>{
 
 	dispatch({type:LOADING_UI})
+
 	axios
 	.post('/scream',newScream)
 	.then(res=> {
@@ -113,7 +114,7 @@ export const postScream=newScream=>(dispatch)=>{
 
 		})
 
-	dispatch({type:CLEAR_ERRORS})	
+	dispatch(clearErrors())	
 
 	}).catch(err=>{
 
@@ -127,9 +128,34 @@ export const postScream=newScream=>(dispatch)=>{
 
 }
 
+export const submitComment = (screamId, commentData) => dispatch => {
+  axios
+    .post(`/scream/${screamId}/comment`, commentData)
+    .then(res => {
+      dispatch({ type: SUBMIT_COMMENTS, payload: res.data });
+      dispatch(clearErrors());
+    })
+    .catch(err => {
+      dispatch({ type: SET_ERRORS, payload: err.response.data });
+    });
+};
+
+export const clearErrors = () => dispatch => {
+  dispatch({ type: CLEAR_ERRORS });
+};
 
 
-
+export const getUserData = userHandle => dispatch => {
+  dispatch({ type: LOADING_DATA });
+  axios
+    .get(`/user/${userHandle}`)
+    .then(res => {
+      dispatch({ type: SET_SCREAMS, payload: res.data.screams });
+    })
+    .catch(() => {
+      dispatch({ type: SET_SCREAMS, payload: null });
+    });
+};
 
 
 

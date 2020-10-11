@@ -6,7 +6,6 @@ import Typography from '@material-ui/core/Typography'
 import Grid from '@material-ui/core/Grid'
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button'
-import axios from 'axios'
 import {Link} from 'react-router-dom'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import {connect} from 'react-redux'
@@ -45,7 +44,6 @@ const styles={
 		position:'absolute'
 	}
 
-
 }
 
  class Login extends React.Component {
@@ -62,7 +60,7 @@ const styles={
  	}
 
  	componentWillReceiveProps(nextProps){
-
+ 
 
  		if(nextProps.UI.errors){
 
@@ -74,8 +72,7 @@ const styles={
 
  	handleSubmit=(event)=>{
 
- 		event.preventDefault()
-
+ 		event.preventDefault();
 
  		const userData={
  			email:this.state.email,
@@ -90,6 +87,7 @@ const styles={
 
  	handleChange=(event)=>{
 
+ 	
 
  		this.setState({
 
@@ -102,8 +100,14 @@ const styles={
 	render() {
         
         const {classes,UI:{loading} }=this.props
+ 
+     
+
 
         const {errors}=this.state
+
+        console.log("this is an error")
+
 
 
 		return (
@@ -127,15 +131,15 @@ const styles={
 
 			        {errors.general && (<Typography variant="body2" className={classes.customError}>{errors.general}</Typography>)}
 
-			        <Button type="submit" variant="contained" value="Submit" disabled={loading} color="primary" className={classes.button}>Login {loading && <CircularProgress size={20} className={classes.progress} />}</Button>
+			        <Button type="submit" variant="contained" value="Submit" disabled={loading} color="primary" className={classes.button}>Login {loading && (<CircularProgress size={20} className={classes.progress} />)}</Button>
 			        <br />
 
-			        <small>Don't Have an account sign up ?<Link to="/signup">here</Link></small>
+			        <small>Don't Have an account sign up ?<Link to="/signup">here</Link>
+			        </small>
 
 			    </form>
 			
 			</Grid>
-
 
 			</Grid>
 		);

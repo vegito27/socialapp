@@ -26,11 +26,7 @@ const isEmpty=(string)=>{
 
 const isEmail=(email)=>{
 
-
-	 const regex=/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-	console.log(regex)
-
+	const regex="^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$"
 	if(email.match(regex)) return true
 
 	return false	
@@ -45,11 +41,13 @@ exports.login=(request,response)=>{
 		password:request.body.password
 	}
 
+
 	let errors={}
 
 	if(isEmpty(user.email)) errors.email="Must not be empty"
 
 	if(isEmpty(user.password)) errors.password="Password must not be empty"
+
 
 	if(Object.keys(errors).length>0){
 
@@ -57,9 +55,7 @@ exports.login=(request,response)=>{
 	}	
 
 
-	firebase
-	.auth()
-	.signInWithEmailAndPassword(user.email,user.password)
+	firebase.auth().signInWithEmailAndPassword(user.email,user.password)
 	.then(data=>{
 		return data.user.getIdToken();
 	}).
@@ -68,28 +64,20 @@ exports.login=(request,response)=>{
 		return response.json({token})
 	})
 	.catch(err=>{
-
-		if(err){
-
-		     console.error("error login", error);
-
+		if(err)
 			return response.status(403).json({general:"Wrong Credentials,Please try again!"})
-		}
 
 	})
 }
 
-//signup with authentication
 
 exports.signup=(request,response)=>{
 
 	const newUser={
-
 		email:request.body.email,
 		password:request.body.password,
 		confirmPassword:request.body.confirmPassword,
 		handle:request.body.handle
-
 	}
 
 	let errors={}
@@ -116,147 +104,127 @@ exports.signup=(request,response)=>{
 
 
 	let token,userId;
-    let img='4.jpeg'
 
+	db.doc(`/users/${newUser.handle}`)
+		.get()
+		.then(doc=>{
 
-	db.doc(`/users/${newUser.handle}`).get().then(doc=>{
+			if(doc.exists){
 
-		if(doc.exists){
+				return response.status(400).json({handle:'This handle has already taken'})
+			
+			}else{
 
-			return response.status(400).json({handle:'this handle has already taken'})
+				return firebase.auth().createUserWithEmailAndPassword(newUser.email,newUser.password)
+			}
+		})
+		.then(data=>{
 		
-		}else{
+			userId=data.user.uid
 
-			return firebase.auth().createUserWithEmailAndPassword(newUser.email,newUser.password)
-		}
-	})
-	.then(data=>{
-		// return response.status(201).json({message:`user ${data.user.uid} signed up successfully`})
+			return data.user.getIdToken()
 
-		userId=data.user.uid
+		})
+		.then(Idtoken=>{
 
-		return data.user.getIdToken()
+			token=Idtoken;
 
-	}).then(Idtoken=>{
+			const userCredentials={
 
-		token=Idtoken;
-
-		const userCredentials={
-
-			handle:newUser.handle,
-			email:newUser.email,
-			createdAt:new Date().toISOString(),
-			imageUrl:`https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${img}?alt=media`,
-			userId: userId
-		}
+				handle:newUser.handle,
+				email:newUser.email,
+				createdAt:new Date().toISOString(),
+				imageUrl:`https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/no-img.png?alt=media`,
+				userId: userId
+			}
 
 		return db.doc(`/users/${newUser.handle}`).set(userCredentials)
 
 
-	}).then((data)=>{
+		})
+		.then((data)=>{
 
-		return response.status(201).json({token})
+			return response.status(201).json({token})
 
-	}).catch(err=>{
+		})
+		.catch(err=>{
 		
-		console.log("Error signing up",err)
+			console.error(err)
 
-		if(err.code!=='auth/email-already-in-us'){
-			return response.status(400).json({ email:'Email is already in use' })
-		}else{
+			if(err.code==='auth/email-already-in-use'){
+				return response.status(400).json({ email:'Email is already in use' })
+			}else{
 
-		return response.status(500).json({general:'Something went wrong,Please try again'} );
-        
-        }
+			return response.status(500).json({general:'Something went wrong,Please try again'} );
+	        
+	        }
 
 	})
 }
 
+ const validateImageType = mimeType => {
+  if (mimeType === "image/jpeg" || mimeType === "image/png") {
+    return true;
+  }
+  return false;
+};
 //upload the image
-exports.ImageUpload=(request,response)=>{
+exports.uploadImage = (req, res) => {
+  const BusBoy = require("busboy");
+  const path = require("path");
+  const os = require("os");
+  const fs = require("fs");
 
-	const BusBoy=require('busboy')
-	const path=require('path')
-	const os=require('os')
-	const fs=require('fs')
+  const busboy = new BusBoy({ headers: req.headers });
 
-	const busboy=new BusBoy({ headers:request.headers })
+  let imageFileName;
+  let imageToBeUploaded = {};
 
+  busboy.on("file", (field, file, fileName, encoding, mimeType) => {
+    if (!validateImageType(mimeType)) {
+      return res
+        .status(400)
+        .json({ error: "image file should be jpeg or png" });
+    }
 
-	let imageFileName;
+    let fileNameParts = fileName.split(".");
+    const imageExtension = fileNameParts[fileNameParts.length - 1];
+    imageFileName = `${Math.round(
+      Math.random() * 100000000
+    )}.${imageExtension}`;
+    const filePath = path.join(os.tmpdir(), imageFileName);
+    imageToBeUploaded = { filePath, mimeType };
+    file.pipe(fs.createWriteStream(filePath));
+  });
 
-	let imageToBeUploaded={};
-
-
-	busboy.on('file',(fieldname,file,filename,encoding,mimetype)=>{
-
-		if(mimetype!== 'image/jpeg' && mimetype!=='image/png'){
-
-			return response.status(400).json({error: 'Wrong File Type Submitted'})
-
-		}
-
-		console.log(filename)
-		console.log(fieldname)
-		console.log(mimetype)
-
-		const imageExtension=filename.split('.')[filename.split('.').length-1]
-
-		const imageFileName=filename.split('.')[0]
-
-		console.log(imageFileName)
-
-		const filepath=path.join(os.tmpdir(),imageFileName)
-
-		imageToBeUploaded={ filepath, mimetype}
-
-		file.pipe(fs.createWriteStream(filepath))
-
-	})
-
-
-	busboy.on('finish',()=>{
-
-		admin.storage().bucket(config.storageBucket).upload(
-
-		imageToBeUploaded.filepath,
-		{
-			resumable:false,
-
-			metadata:{
-
-				metadata:{
-
-				contentType:imageToBeUploaded.mimetype
-			}
-		}
-
-	})
-	.then(()=>{
-
-		const imageUrl=`https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`
-
-		return db.doc(`/users/${request.user.handle}`).update({ imageUrl })
-
-
-	}).then(()=>{
-
-		return response.json({message:'Image uploaded successfully'})
-
-    }).catch(err=>{
-
-    	console.error(err)
-
-    	return response.status(500).json({error:err.code})
-
-    })
-
-})
-
-	busboy.end(request.rawBody)
-
-}
-
+  busboy.on("finish", () => {
+    admin
+      .storage()
+      .bucket(config.storageBucket)
+      .upload(imageToBeUploaded.filePath, {
+        resumable: false,
+        metadata: {
+          metadata: {
+            contentType: imageToBeUploaded.mimeType
+          }
+        }
+      })
+      .then(() => {
+        const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${
+          config.storageBucket
+        }/o/`+imageFileName+`?alt=media`;
+        return db.doc(`/users/${req.user.handle}`).update({ imageUrl });
+      })
+      .then(() => {
+        return res.json({ message: "image uploaded successfully" });
+      })
+      .catch(error => {
+        console.error("error uploading image", error);
+        res.status(500).json(error);
+      });
+  });
+  busboy.end(req.rawBody);
+};
 
 reduceUserDetails=data=>{
 
@@ -393,8 +361,6 @@ exports.getUserDetails=(request,response)=>{
 			       .get()
 		}else{
 			return response.status(404).json({message:"user does not exists"})
-
-
 
 		}
 	})

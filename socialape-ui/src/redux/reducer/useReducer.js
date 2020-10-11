@@ -1,10 +1,9 @@
-import { SET_USER, SET_ERRORS, CLEAR_ERRORS, LOADING_UI,SET_AUTHENTICATED,SET_UNAUTHENTICATED,LOADING_USER,LIKE_SCREAM ,UNLIKE_SCREAM,POST_SCREAM} from '../types'
+import { SET_USER, SET_ERRORS, CLEAR_ERRORS, LOADING_UI,SET_AUTHENTICATED,SET_UNAUTHENTICATED,LOADING_USER,LIKE_SCREAM ,UNLIKE_SCREAM,POST_SCREAM,MARK_NOTIFICATIONS_READ} from '../types'
 
 const initialState={
  
 	authenticated:false,
 	credentials:{},
-	loading:false,
 	likes:[],
 	notifications:[]
 } 
@@ -23,11 +22,7 @@ export default function(state=initialState,action){
 	        return initialState;
 
 	    case SET_USER:
-	        return {
-	        	authenticated:true,
-	        	loading:false,
-	        	...action.payload
-	        }
+	        return { authenticated: true, loading: false, ...action.payload };
 
 	    case LOADING_USER:
 	        return {
@@ -54,9 +49,11 @@ export default function(state=initialState,action){
 				likes:state.likes.filter(like=>like.screamId!==action.payload.screamId)
 
 			}
-		
 
-			
+		case MARK_NOTIFICATIONS_READ:
+			state.notifications.forEach(not=> not.read) 
+			return { ...state }
+
 	    default:
 	        return state; 
  

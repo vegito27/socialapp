@@ -17,11 +17,18 @@ import MyButton from '../util/MyButton'
 
 
 const styles = {
+	dialog:{
+	textAlign:"center"
+	},
   button: {
-    float: "right"
+    float: "left"
+  },
+  cbutton:{
+  	float:"left"
   },
   textField: {
-    margin: "10px auto 10px auto"
+    margin:"auto",
+    textAlign:"center"
   }
 };
 
@@ -91,9 +98,6 @@ class EditDetails extends Component{
 
 	}
 
-
-
-
 	render(){
 
 		const {classes} = this.props;
@@ -115,9 +119,9 @@ class EditDetails extends Component{
 
 			    <DialogTitle>Edit your Details</DialogTitle>
 
-			    <DialogContent>
+			    <DialogContent className={classes.dialog}>
 
-				    <form>
+				    <form >
 					    <TextField name="bio" label="Bio" 
 						    type="text" multiline rows="3"  
 						    placeholder="A short bio about yourself" className={classes.textField} 
@@ -135,7 +139,7 @@ class EditDetails extends Component{
 					    />
 
 					     <TextField
-							    name="location " label="Location" 
+							    name="location" label="Location" 
 							    type="text" multiline rows="3"  
 							    placeholder="Where you live" className={classes.textField} 
 							    value={this.state.location}
@@ -149,9 +153,9 @@ class EditDetails extends Component{
 
 			    <DialogActions>
 
-				    <Button onClick={this.handleClose} color="primary">Close</Button>
+				    <Button onClick={this.handleClose} color="primary" className={classes.cbutton}>Close</Button>
 
-	                <Button onClick={this.handleSubmit} color="primary">Save</Button>
+	                <Button onClick={this.handleSubmit} color="primary" className={classes.sbutton}>Save</Button>
 
 			    </DialogActions>
 
