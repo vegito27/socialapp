@@ -32,7 +32,8 @@ export const loginUser=(userData,history)=>(dispatch)=>{
 
 export const signupUser = (userData, history) => dispatch => {
   dispatch({ type: LOADING_UI });
-  axios.post("/signup", userData).then(result => {
+  axios
+  .post("/signup", userData).then(result => {
       setAuthorizationHeader(result.data.token);
       dispatch(getUserData());
       dispatch({ type: CLEAR_ERRORS });
@@ -99,7 +100,7 @@ export const editUserDetails=userDetails=>(dispatch)=>{
 
 		dispatch(getUserData());
 	})
-	.catch(err=> console.log(err) )
+	.catch(err=> console.log(err))
 
 }
 

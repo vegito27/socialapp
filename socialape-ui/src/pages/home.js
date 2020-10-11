@@ -16,17 +16,10 @@ class Home extends React.Component {
 
 	}
 
-	state={
-		pick:"random"
-	}
 
 	render() {
 
 		const {screams,loading}=this.props.data
-
-		console.log(this.state)
-
-		console.log(screams)
 
 		let recentScreamsMarkUp=!loading?screams.map(scream=><Scream key={scream.screamId} scream={scream} />):<p>Loading....</p>
 

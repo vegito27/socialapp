@@ -27,6 +27,20 @@ export const getScreams=()=>dispatch=>{
 	})
 }
 
+export const postScream = newScream => dispatch => {
+  dispatch({ type: LOADING_UI });
+  axios
+    .post("/scream", newScream)
+    .then(res => {
+    	console.log(res)
+      dispatch({ type: POST_SCREAM, payload: res.data });
+      dispatch(clearErrors());
+    })
+    .catch(err => {
+      dispatch({ type: SET_ERRORS, payload: err.response.data });
+    });
+};
+
 export const getScream=screamId=>dispatch=>{
 
 	dispatch({type:LOADING_UI})
@@ -61,9 +75,7 @@ export const likeScream=screamId=>dispatch=>{
 		console.log(err)
 		
 	})
-
 }
-
 
 export const UnlikeScream=screamId=>dispatch=>{
 
@@ -99,34 +111,7 @@ export const deleteScream=screamId=>dispatch=>{
 
 }
 
-export const postScream=newScream=>(dispatch)=>{
-
-	dispatch({type:LOADING_UI})
-
-	axios
-	.post('/scream',newScream)
-	.then(res=> {
-
-		dispatch({
-
-			type:POST_SCREAM,
-			payload:res.data
-
-		})
-
-	dispatch(clearErrors())	
-
-	}).catch(err=>{
-
-		dispatch({
-			type:SET_ERRORS,
-			payload:err.response.data
-
-		})
-
-	})
-
-}
+ 
 
 export const submitComment = (screamId, commentData) => dispatch => {
   axios

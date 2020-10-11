@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import CommentForm from './CommentForm'
 import dayjs from "dayjs";
 import MyButton from "../util/MyButton";
-import LikeButton from './LikeButton'
 import Comments from './Comments'
 import withStyles from "@material-ui/core/styles/withStyles";
 import Dialog from "@material-ui/core/Dialog";
@@ -101,43 +100,7 @@ class ScreamDialog extends Component {
       UI: { loading }
     } = this.props;
 
-    const dialogMarkup = loading ? (
-      <div className={classes.spinnerDiv}>
-        <CircularProgress size={100} thickness={2} />
-      </div>
-    ) : (
-	  <Grid container={16}>
-	    <Grid item sm={5}>
-	      <img src={userImage} alt="profile" className={classes.profileImage} />
-	    </Grid>
-	    <Grid item sm={7}>
-	          <Typography component={Link} color="primary" variant="h5" to={`/users/${userHandle}`} > @{userHandle} </Typography>
-
-
-	      <hr className={classes.invisibleSeparator} />
-	      <Typography color="textSecondary" variant="body2">
-	        {dayjs(createdAt).format("h:mm a, MMMM DD YYYY")}
-	      </Typography>
-
-
-	      <hr className={classes.invisibleSeparator} />
-	      <Typography variant="body1">{scream}</Typography>
-
-	       <LikeButton screamId={screamId} />
-		   <span>{likeCount} Likes</span>
-	      
-	      <MyButton tip="comments">
-	        <ChatIcon color="primary" />
-	      </MyButton>
-	      <span>{commentCount} comments</span>
-	    </Grid>/
-	    <CommentForm screamId={screamId} />
-
-	    <Comments comments={comments} />
-	    <hr className={classes.visibleSeparator} />
-	   
-	  </Grid>
-    );
+   
     return (
       <Fragment>
         <MyButton
@@ -162,7 +125,7 @@ class ScreamDialog extends Component {
             <CloseIcon />
           </MyButton>
           <DialogContent className={classes.dialogContent}>
-            {dialogMarkup}
+            
           </DialogContent>
         </Dialog>
       </Fragment>

@@ -22,6 +22,8 @@ import CloseIcon from '@material-ui/icons/Close'
 import {connect} from 'react-redux'
 import { editUserDetails } from '../redux/actions/userActions'
 
+
+
 const styles={
 textField: {
     marginBottom: "10px"
@@ -51,7 +53,7 @@ class PostScream extends Component{
 
 	state={
 		open:false,
-		scream:'',
+		scream:"",
 		errors:{}
 	}
 
@@ -62,7 +64,7 @@ class PostScream extends Component{
     }
     // scream posted successfuly
     if (!nextProps.UI.errors && !nextProps.UI.loading) {
-      this.setState({ scream: "" ,open:false,errors:{}});
+      this.setState({ body: "" ,open:false,errors:{}});
       this.handleClose()
       
     }
@@ -83,7 +85,7 @@ class PostScream extends Component{
 
     handleSubmit = event => {
 	    event.preventDefault()
-	    this.props.postScream({ scream: this.state.scream });
+	    this.props.postScream({ scream: this.state.body });
 	  };
 
 	render(){
@@ -95,7 +97,7 @@ class PostScream extends Component{
 		
 		return (
 
-			<Fragment>
+			<div >
 				<MyButton onClick={this.handleOpen} tip="Post a Scream!" >
 				
 				<AddIcon color="primary" />
@@ -122,10 +124,10 @@ class PostScream extends Component{
 						<form onSubmit={this.handleSubmit}>
 							 
 							<TextField name="scream" type="text" 
-								label="add Scream.." multiline rows="2" 
+								label="Add Scream.." multiline rows="2" 
 								placeholder="Scream at your fellow apes" 
 								className={classes.textField}
-								errors={errors.scream ? true:false} 
+								error={errors.scream ? true:false} 
 								helperText={errors.scream} 
 								onChange={this.handlechange} 
 								fullWidth />
@@ -140,7 +142,7 @@ class PostScream extends Component{
 
 					</DialogContent>
 				</Dialog>
-			</Fragment>
+			</div>
 
 		)
 	}
