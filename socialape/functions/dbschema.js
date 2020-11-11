@@ -1,7 +1,6 @@
 let db={
 
 	users:[{
-
 		userId:"wYjVWc2xgqekE4IuA8qpLtKCxjw2",
 		email:"trishabh889@gmail.com",
 		handle:"print",
@@ -36,9 +35,6 @@ let db={
 
 	}] 
 }
-
-
-
 
 const userDetails={
 

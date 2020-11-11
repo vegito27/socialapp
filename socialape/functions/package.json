@@ -5,7 +5,7 @@
     "lint": "eslint .",
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
-    "start": "nodemon index.js",
+    "start": "firebase  serve",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log"
   },
@@ -25,5 +25,7 @@
     "eslint-plugin-promise": "^4.0.1",
     "firebase-functions-test": "^0.2.0"
   },
-  "private": true
+  "private": true,
+  "proxy":"https://asia-south1-socialape-e3733.cloudfunctions.net/api"
+
 }

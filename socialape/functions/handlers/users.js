@@ -70,7 +70,6 @@ exports.login=(request,response)=>{
 	})
 }
 
-
 exports.signup=(request,response)=>{
 
 	const newUser={
@@ -119,6 +118,8 @@ exports.signup=(request,response)=>{
 			}
 		})
 		.then(data=>{
+
+			console.log("0\n")
 		
 			userId=data.user.uid
 
@@ -126,6 +127,8 @@ exports.signup=(request,response)=>{
 
 		})
 		.then(Idtoken=>{
+
+			console.log("1\n")
 
 			token=Idtoken;
 
@@ -143,6 +146,8 @@ exports.signup=(request,response)=>{
 
 		})
 		.then((data)=>{
+
+			console.log("2\n")
 
 			return response.status(201).json({token})
 

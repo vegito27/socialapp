@@ -15,13 +15,13 @@ exports.getAllScreams=(request,response)=>{
 
 			screams.push({
 
-				    screamId:doc.id,
-					scream:doc.data().scream,
-					userHandle:doc.data().userHandle,
-					createdAt:new Date().toISOString(),
-					userImage:doc.data().userImage, 
-					commentCount:doc.data().commentCount,
-					likeCount:doc.data().likeCount
+			    screamId:doc.id,
+				scream:doc.data().scream,
+				userHandle:doc.data().userHandle,
+				createdAt:new Date().toISOString(),
+				userImage:doc.data().userImage, 
+				commentCount:doc.data().commentCount,
+				likeCount:doc.data().likeCount
 			
 			})
 		})
@@ -41,7 +41,7 @@ exports.getAllScreams=(request,response)=>{
 
 exports.postOneScream=(request,response)=>{
 
-	if(request.body.scream.trim()===''){
+	if(request.body.scream && request.body.scream.trim()===''){
 
 		return response.status(400).json({comment:'Body Must Not be Empty'})
 
@@ -68,13 +68,13 @@ exports.postOneScream=(request,response)=>{
 
 		return response.json(resScream) 
 
-
 	;})
 
 	.catch(err=>{ 
-		response.status(500).json({error:'something went wrong'});
+		if(err){
+		 response.status(500).json({error:'something went wrong'});
+		}
 
-		console.error(err)
 	})
 
 }

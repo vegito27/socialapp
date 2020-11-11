@@ -2,8 +2,8 @@ const functions = require('firebase-functions');
 
 const admin=require('firebase-admin')
 
-
 const serviceAccount = {
+
   "type": "service_account",
   "project_id": "socialape-e3733",
   "private_key_id": "cc12d629deea0ce7c46ec1e71da5e7cc9989a147",
@@ -23,12 +23,15 @@ admin.initializeApp({
 
 });
 
+const cors =require('cors')
+
 const express=require('express')
 
 const app=express()
 
-const db=admin.firestore()
+app.use(cors())
 
+const db=admin.firestore()
 
 const { getAllScreams,postOneScream,getScreams,commentOnScream,likeScream,unlikeScream,deleteScream } = require('./handlers/screams')
 
@@ -49,7 +52,6 @@ app.get('/scream/:screamId/unlike',FBAuth,unlikeScream)
 app.post('/scream/:screamId/comment',FBAuth,commentOnScream)
 
 app.delete('/scream/:screamId/',FBAuth,deleteScream)
-
 
 app.post('/login',login)
 
@@ -127,22 +129,21 @@ exports.createNotificationOnComments=functions
 })
 
 
-exports.deleteNotificationOnUnlike=
-functions.region('asia-south1')
-.firestore
-.document('likes/{id}')
-.onDelete(snapshot=>{
+exports.deleteNotificationOnUnlike=functions.region('asia-south1')
+	.firestore
+	.document('likes/{id}')
+	.onDelete(snapshot=>{
 
-	db.doc(`/notifications/${snapshot.id}`)
-	.delete()
-	
-	.catch(err=>{
-	
-		console.error(err)
-	
+		db.doc(`/notifications/${snapshot.id}`)
+		.delete()
+		
+		.catch(err=>{
+		
+			console.error(err)
+		
+		})
+
 	})
-
-})
 
 
 exports.onUserImageChange=functions
@@ -217,20 +218,15 @@ functions
 		})
 
 		return db.collection('notifications').where('screamId','==',screamId).get()
-
-
 	})
 	.then(data=>{
 
 		data.forEach(doc=>{
 
 			batch.delete(db.doc(`/notifications/${doc.id}`))
-
 		})
 
 		return batch.commit()
-
-
 	}).
 	catch(err=>console.error(err))      
 
