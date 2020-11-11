@@ -65,9 +65,9 @@ const theme=createMuiTheme({
   progress:{
     position:'absolute'
   }
-
-
 })
+
+axios.defaults.baseURL='https://asia-south1-apiproject-272406.cloudfunctions.net/api'
 
 let authenticated;
 
@@ -100,7 +100,6 @@ if(token){
   console.log(decodedToken)
 
 }
-
 
 class App extends Component{
 

@@ -24,8 +24,10 @@ const styles = {
 };
 
 class CommentForm extends Component {
+  
+
   state = {
-    scream: "",
+    body: "",
     errors: {}
   };
 
@@ -38,6 +40,7 @@ class CommentForm extends Component {
     }
   }
   handleChange = event => {
+
     this.setState({ [event.target.name]: event.target.value });
   };
 
@@ -51,10 +54,12 @@ class CommentForm extends Component {
 
     const commentFormMarkup = authenticated ? (
       <Grid item sm={12} style={{ textAlign: "center" }}>
+
         <form onSubmit={this.handleSubmit}>
+          
           <TextField
             name="body"
-            label="comment on scream"
+            label="Comment on scream"
             type="text"
             error={errors.comment ? true : false}
             helperText={errors.comment}
@@ -63,6 +68,7 @@ class CommentForm extends Component {
             fullWidth
             className={classes.textField}
           />
+
           <Button
             type="submit"
             variant="contained"
@@ -93,3 +99,13 @@ CommentForm.propTypes = {
 };
 
 export default connect(mapStateToProps,{ submitComment })(withStyles(styles)(CommentForm));
+
+
+
+
+
+
+
+
+
+

@@ -21,19 +21,25 @@ export const loginUser=(userData,history)=>(dispatch)=>{
 
  		}).catch(error=>{
 
+ 	
  			dispatch({
 
  				type:SET_ERRORS,
- 				payload:error.response.data
+ 				payload:error.response
 
  			})
  		})
 }
 
 export const signupUser = (userData, history) => dispatch => {
+
+	console.log(userData)
+
   dispatch({ type: LOADING_UI });
   axios
-  .post("/signup", userData).then(result => {
+  .post("/signup", userData)
+  .then(result => {
+  	console.log('hello')
       setAuthorizationHeader(result.data.token);
       dispatch(getUserData());
       dispatch({ type: CLEAR_ERRORS });

@@ -30,14 +30,21 @@ const styles = {
 class Comments extends Component {
   render() {
     const { comments, classes } = this.props;
+
+    console.log(comments)
+
     return (
       <Grid container>
-        {comments.map((comment, index) => {
+        { comments && comments.map((comment, index) => {
+
           const { body, createdAt, userHandle, userImage } = comment;
+
           return (
             <Fragment key={createdAt}>
               <Grid item sm={12}>
+              
                 <Grid container>
+
                   <Grid item sm={2}>
               
                        <img src={userImage} alt="user profile pic" className={classes.commentImage} />
@@ -47,6 +54,7 @@ class Comments extends Component {
 
                   <Grid item sm={9}>
                     <div className={classes.commentData}>
+                      
                       <Typography variant="h5" component={Link} to={`/users/${userHandle}`} color="primary">
                         {userHandle}
                       </Typography>
@@ -58,7 +66,9 @@ class Comments extends Component {
                       <Typography variant="body1">{body}</Typography>
 
                     </div>
+
                   </Grid>
+
                 </Grid>
               </Grid>
 
@@ -76,3 +86,6 @@ Comments.propTypes = {
   comments: PropTypes.array.isRequired
 };
 export default withStyles(styles)(Comments);
+
+
+

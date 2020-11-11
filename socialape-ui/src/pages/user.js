@@ -17,6 +17,7 @@ class user extends Component {
     profile: null,
     screamIdParam: null
   };
+  
   componentDidMount() {
     const handle = this.props.match.params.handle;
     const screamId = this.props.match.params.screamId;

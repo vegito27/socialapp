@@ -13,10 +13,8 @@ class Home extends React.Component {
 	componentDidMount(){
 		
 		this.props.getScreams()
-
 	}
-
-
+	
 	render() {
 
 		const {screams,loading}=this.props.data

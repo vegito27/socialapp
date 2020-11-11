@@ -104,8 +104,6 @@ form:{
 
         const {errors}=this.state
 
-        console.log(this.state)
-
 
 		return (
 			<Grid container className={classes.form}>

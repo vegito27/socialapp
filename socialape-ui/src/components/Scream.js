@@ -62,7 +62,7 @@ class Scream extends  React.Component {
 
 		dayjs.extend(relativeTime)
 
-		const { classes,scream:{commentCount,createdAt,likeCount,scream,screamId,userHandle,userImage},user:{authenticated,credentials:{handle } } } = this.props;
+		const { scream:{commentCount,createdAt,likeCount,screamId,userHandle},user:{authenticated,credentials:{handle } } } = this.props;
 
     	const deleteButton=authenticated && userHandle===handle ?(<DeleteScream screamId={screamId} />):null 
 
@@ -99,7 +99,7 @@ class Scream extends  React.Component {
 			        <CardContent className={this.props.classes.content}> 
 			            <Typography variant="h5" component={Link} to={`/users/${this.props.scream.userHandle}`} color="primary">{this.props.scream.userHandle}</Typography>
 			            {deleteButton}
-			            <Typography variant="body2" color="textSecondary">{dayjs(createdAt).fromNow()} </Typography>
+			            <Typography variant="body2" color="textSecondary"> {dayjs(createdAt).format("h:mm a, MMMM DD YYYY")} </Typography>
 			            <Typography variant="body1">{this.props.scream.scream}</Typography>
 
 			           {likeButton}
@@ -110,7 +110,7 @@ class Scream extends  React.Component {
 				            <ChatIcon color="primary"/>
 			            </MyButton>
 
-			            <span>{commentCount}</span>
+			            <span>{commentCount} Comments</span>
 
 			            <ScreamDialog screamId={screamId} userHandle={userHandle} />
 			           

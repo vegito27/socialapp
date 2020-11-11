@@ -1,8 +1,5 @@
-import React,{Component,Fragment} from 'react';
+import React,{Fragment} from 'react';
 import { withStyles } from '@material-ui/core/styles'
-import {Link} from 'react-router-dom'
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
 import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
 import MyButton from '../util/MyButton'
@@ -13,16 +10,12 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import DeleteOutline from '@material-ui/icons/DeleteOutline'
 import { deleteScream } from '../redux/actions/dataActions'
 
-
-
-
 const styles={
 
 	deleteButton:{
 		position:'absolute',
 		left:'58%'
 	}
-
 }
 
 
@@ -43,16 +36,14 @@ class DeleteScream extends React.Component {
 
 	}
 
+	deleteScream=(event)=>{
 
-	deleteScream=()=>{
+		 event.preventDefault()
 
 		this.props.deleteScream(this.props.screamId)
 
 		this.setState({open:false})
 	}
-
-
-
 
 	render() {
 
@@ -71,9 +62,9 @@ class DeleteScream extends React.Component {
 
 					<DialogActions>
 					
-						<Button onClick={this.handleClose} color="primary"  variant="contained">Cancel</Button>
+						<Button onClick={this.handleClose} color="primary"  >Cancel</Button>
 
-						<Button onClick={this.deleteScream} color="secondary"  variant="contained">Delete</Button>
+						<Button onClick={this.deleteScream} color="secondary" >Delete</Button>
 
 					</DialogActions>
 

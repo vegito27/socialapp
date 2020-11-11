@@ -69,7 +69,6 @@ const styles={
         }
  	}
 
-
  	handleSubmit=(event)=>{
 
  		event.preventDefault();
@@ -80,14 +79,10 @@ const styles={
  		}
 
  		this.props.loginUser(userData,this.props.history)
-
-
  	}
 
 
  	handleChange=(event)=>{
-
- 	
 
  		this.setState({
 
@@ -106,7 +101,7 @@ const styles={
 
         const {errors}=this.state
 
-        console.log("this is an error")
+        console.log(errors)
 
 
 

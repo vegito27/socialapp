@@ -3,8 +3,6 @@ import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
 import {connect} from 'react-redux'
 import { editUserDetails } from '../redux/actions/userActions'
-import Tooltip from '@material-ui/core/Tooltip'
-import IconButton from '@material-ui/core/IconButton'
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
@@ -13,8 +11,6 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import EditIcon from '@material-ui/icons/Edit'
 import MyButton from '../util/MyButton'
-
-
 
 const styles = {
 	dialog:{
@@ -102,80 +98,74 @@ class EditDetails extends Component{
 
 		const {classes} = this.props;
 
-
 		return (
 
 			<Fragment>
 
-			<MyButton tip="Edit Details" onClick={this.handleOpen} btnClasssName={classes.button} >
-				<EditIcon color="primary" />
-			</MyButton>
+				<MyButton 
+					tip="Edit Details" 
+					onClick={this.handleOpen} 
+					btnClasssName={classes.button} >
 
-			<Dialog 
-			    open={this.state.open}
-			    onClose={this.handleClose}
-			    fullWidth
-			    maxWidth="sm" >
+					<EditIcon color="primary" />
 
-			    <DialogTitle>Edit your Details</DialogTitle>
+				</MyButton>
 
-			    <DialogContent className={classes.dialog}>
+				<Dialog 
+				    open={this.state.open}
+				    onClose={this.handleClose}
+				    fullWidth
+				    maxWidth="sm" >
 
-				    <form >
-					    <TextField name="bio" label="Bio" 
-						    type="text" multiline rows="3"  
-						    placeholder="A short bio about yourself" className={classes.textField} 
-						    value={this.state.bio}
-							onChange={this.handleChange}
-					    
-				    />
+				    <DialogTitle>Edit your Details</DialogTitle>
 
-					    <TextField name="website" label="Website" 
+				    <DialogContent className={classes.dialog}>
+
+					    <form >
+						    <TextField name="bio" label="Bio" 
+							    type="text" multiline rows="3"  
+							    placeholder="A short bio about yourself" className={classes.textField} 
+							    value={this.state.bio}
+								onChange={this.handleChange}    
+						    />
+
+						    <TextField name="website" label="Website" 
 							    type="text" multiline rows="3"  
 							    placeholder="Your personal or professional website" className={classes.textField} 
 							    value={this.state.website}
-							    onChange={this.handleChange}
-					    
-					    />
+							    onChange={this.handleChange} 
+						    />
 
-					     <TextField
+						     <TextField
 							    name="location" label="Location" 
 							    type="text" multiline rows="3"  
 							    placeholder="Where you live" className={classes.textField} 
 							    value={this.state.location}
-							    onChange={this.handleChange}
-					    
-					    />
+							    onChange={this.handleChange}   
+						    />
+					    </form>
 
-				    </form>
+					</DialogContent>
 
-			    </DialogContent>
+				    <DialogActions>
 
-			    <DialogActions>
+					    <Button onClick={this.handleClose} color="primary" className={classes.cbutton}>Close</Button>
 
-				    <Button onClick={this.handleClose} color="primary" className={classes.cbutton}>Close</Button>
+		                <Button onClick={this.handleSubmit} color="primary" className={classes.sbutton}>Save</Button>
 
-	                <Button onClick={this.handleSubmit} color="primary" className={classes.sbutton}>Save</Button>
+				    </DialogActions>
 
-			    </DialogActions>
-
-
-			    </Dialog>
-
+				</Dialog>
 
 			</Fragment>
 
-
-
 			)
-
 	}
 }
 
 const mapStateToProps = state => ({
   credentials: state.user.credentials
 });
-const mapActionsToProps = { editUserDetails };
 
 EditDetails.propTypes = {
   classes: PropTypes.object.isRequired,

@@ -9,7 +9,6 @@ export const getScreams=()=>dispatch=>{
 
 	axios.get('/screams')
 	.then(res=>{
-		
 
 		dispatch({
 			type:SET_SCREAMS,
@@ -28,15 +27,25 @@ export const getScreams=()=>dispatch=>{
 }
 
 export const postScream = newScream => dispatch => {
+
   dispatch({ type: LOADING_UI });
+
   axios
     .post("/scream", newScream)
     .then(res => {
-    	console.log(res)
+
+    	console.log("posting")
+   
       dispatch({ type: POST_SCREAM, payload: res.data });
+
       dispatch(clearErrors());
+
     })
     .catch(err => {
+
+    	console.log("in catch")
+
+
       dispatch({ type: SET_ERRORS, payload: err.response.data });
     });
 };
@@ -60,6 +69,9 @@ export const getScream=screamId=>dispatch=>{
 
 
 export const likeScream=screamId=>dispatch=>{
+
+
+	dispatch({type:LOADING_UI})
 
 	axios.get(`/scream/${screamId}/like`)
 	.then(res=>{
@@ -99,11 +111,14 @@ export const UnlikeScream=screamId=>dispatch=>{
 
 export const deleteScream=screamId=>dispatch=>{
 
+
+
 	axios
 	.delete(`/scream/${screamId}`)
 	.then(()=>{
 
 		dispatch({ type:DELETE_SCREAM,payload:screamId })
+
 	})
 	.catch(err=>{
 		console.error(err)
@@ -111,9 +126,10 @@ export const deleteScream=screamId=>dispatch=>{
 
 }
 
- 
 
 export const submitComment = (screamId, commentData) => dispatch => {
+
+	console.log(commentData)
   axios
     .post(`/scream/${screamId}/comment`, commentData)
     .then(res => {

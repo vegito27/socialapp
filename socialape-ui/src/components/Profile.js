@@ -76,13 +76,7 @@ const styles = {
   }
 };
 
-
-
 class Profile extends React.Component {
-
-	constructor(props) {
-		super(props);
-	}
 
 
 	handleImageChange=(event)=>{
