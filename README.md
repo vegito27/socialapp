@@ -5,6 +5,6 @@ How to run on localhost ??
 * Run this command: "cd socialapp" and "npm start" in one terminal
 * Run this command:"cd socialape/functions" and "firebase serve"( if you already have installed firebase ) in another terminal
 
-![alt text](https://github.com/vegito27/socialapp/blob/master/socialApeImage/dashboard.png {width=40px height=400px})
+![image](https://github.com/vegito27/socialapp/blob/master/socialApeImage/dashboard.png {width=40px height=400px})
 
-![alt text](https://github.com/vegito27/socialapp/blob/master/socialApeImage/postComments.png {width=40px height=400px})
+![image](https://github.com/vegito27/socialapp/blob/master/socialApeImage/postComments.png {width=40px height=400px})
